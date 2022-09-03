@@ -3,6 +3,7 @@
 package lesson2.task2
 
 import lesson1.task1.sqr
+import kotlin.math.*;
 
 /**
  * Пример
@@ -34,7 +35,7 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
     when{
         x1 == x2 -> return true
         y1 == y2 -> return true
-        x2 - x1 == y2 - y1 -> return true
+        abs(x2 - x1) == abs(y2 - y1) -> return true
         else -> return false
     }
 }
@@ -48,7 +49,7 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
  */
 fun daysInMonth(month: Int, year: Int): Int {
     if (month == 2)
-    	if (year % 4 == 0) return 29 else return 28
+    	if (year % 100 == 0) if (year % 400 == 0) return 29 else return 28 else if (year % 4 == 0) return 29 else return 28
     else
     	if (month in arrayOf(1, 3, 5, 7, 8, 10, 12)) return 31 else return 30
 }
@@ -64,12 +65,7 @@ fun circleInside(
     x1: Double, y1: Double, r1: Double,
     x2: Double, y2: Double, r2: Double
 ): Boolean {
-    if (x1 + r1 <= x2 + r2) 
-    	if (x1 - r1 >= x2 - r2) 
-    		if (y1 + r1 <= y2 + r2)
-    			if (y1 - r1 >= y2 - r2)
-    				return true
-    return false
+    if (sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))+r1 <= r2) return true else return false
 }
 
 /**
