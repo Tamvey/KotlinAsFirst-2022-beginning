@@ -208,7 +208,32 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun revert(n: Int): Int = TODO()
+fun mypow(number: Int, times: Int) : Int{
+    if(times == 0) return 1
+    return number * mypow(number, times - 1)
+}
+fun getNumber(number: Int, place: Int) : Int{
+    return number / mypow(10, place) % 10
+}
+fun getLength(number: Int) : Int{
+	var length = 0
+	while (number / mypow(10, length) != 0){length++}
+	return length
+}
+fun revert(n: Int): Int {
+    /*
+     * 3 2 1 5 1
+     * 
+     * 4 3 2 1 0
+     */
+    var length = getLength(n)
+    var res = 0
+    for(i in 0..length/2){
+        if(i == length - i) res += mypow(10, i)*getNumber(n, i)
+        else res += (mypow(10, length - i)*getNumber(n, i) + mypow(10, i)*getNumber(n, length - i))
+    }
+    return res/10
+}
 
 /**
  * Средняя (3 балла)
@@ -219,7 +244,13 @@ fun revert(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = TODO()
+fun isPalindrome(n: Int): Boolean {
+    var length = getLength(n)
+    for(i in 0..(length-1)/2){
+        if(getNumber(n, i) != getNumber(n, length-i-1)) return false
+    }
+    return true
+}
 
 /**
  * Средняя (3 балла)
@@ -229,7 +260,14 @@ fun isPalindrome(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun hasDifferentDigits(n: Int): Boolean = TODO()
+fun hasDifferentDigits(n: Int): Boolean {
+    var length = getLength(n)
+    var last = getNumber(n, 0)
+    for(i in 0..length-1){
+        if(getNumber(n, i) != last) return true
+    }
+    return false
+}
 
 /**
  * Средняя (4 балла)
