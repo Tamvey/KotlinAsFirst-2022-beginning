@@ -72,11 +72,11 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Long): Int {
-    if(n == (0).toLong()) return 1
+fun digitNumber(n: Int): Int {
+    if(n == 0) return 1
     var amountOfNumbers = 0
     var counter: Long = 1
-    while(n / counter != (0).toLong()){
+    while(n / counter != 0){
 		amountOfNumbers++
 		counter *= 10
     }
