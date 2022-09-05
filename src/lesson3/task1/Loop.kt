@@ -72,13 +72,13 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int {
-    if(n == 0) return 1
-    var amountOfNumbers: Int = 0
-    var counter: Int = 1
-    while(n / counter != 0){
-	amountOfNumbers++
-	counter *= 10
+fun digitNumber(n: Long): Int {
+    if(n == (0).toLong()) return 1
+    var amountOfNumbers = 0
+    var counter: Long = 1
+    while(n / counter != (0).toLong()){
+		amountOfNumbers++
+		counter *= 10
     }
     return amountOfNumbers
 }
@@ -145,7 +145,7 @@ fun collatzSteps(x: Int): Int {
     var x1 = x
     while(x1 != 1){
    		if(x1 % 2 == 0) x1 /= 2
-        else x1 = 3*x1 + 1
+        else x1 = 3 * x1 + 1
         counter++
     }
     return counter
@@ -162,7 +162,7 @@ fun totalMultiplier(x: Int, y: Int): Int{
 	var minn = min(x, y)
 	var maxx = max(x, y)
     val to = floor(sqrt(minn*1.0))
-	for(n in 2..to.toInt()){
+	for(n in 1..to.toInt()){
 		if(minn % n == 0 && maxx % n == 0) res *= n
         if (n == minn / n) break
 		if( (maxx % (minn / n) == 0) && (minn % (minn / n) == 0) )  res *= (minn / n)
@@ -175,15 +175,19 @@ fun lcm(m: Int, n: Int): Int{
  	* n = z * y^j
  	* k = x * z * y^max(i, j)
  	* */
+    if(m == n) return m
 	var res = 1	
     val inCommon = totalMultiplier(m, n)
     var m1 = m
     var n1 = n
-   	while (m1 % inCommon != 0 || n1 % inCommon != 0){
-    	if(m1 % inCommon == 0) m1 /= inCommon
-        if(n1 % inCommon == 0) n1 /= inCommon
+   	while ((m1 % inCommon == 0 || n1 % inCommon == 0) && inCommon != 1){
+    	if(m1 % inCommon == 0) {m1 /= inCommon}
+        if(n1 % inCommon == 0) {n1 /= inCommon}
         res *= inCommon
     }
+    //println(m1)
+    //println(n1)
+    //println(res)
     res *= m1 * n1
     return res
 }
@@ -197,8 +201,7 @@ fun lcm(m: Int, n: Int): Int{
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
     //println(totalMultiplier(m, n))
-    if(totalMultiplier(m, n) == 1) return true
-    return false
+    return (totalMultiplier(m, n) == 1)
 }
 
 /**
@@ -217,7 +220,7 @@ fun getNumber(number: Int, place: Int) : Int{
 }
 fun getLength(number: Int) : Int{
 	var length = 0
-	while (number / mypow(10, length) != 0){length++}
+	while (number / mypow(10, length) != 0 && length < 10){length++}
 	return length
 }
 fun revert(n: Int): Int {
@@ -228,11 +231,11 @@ fun revert(n: Int): Int {
      */
     var length = getLength(n)
     var res = 0
-    for(i in 0..length/2){
-        if(i == length - i) res += mypow(10, i)*getNumber(n, i)
-        else res += (mypow(10, length - i)*getNumber(n, i) + mypow(10, i)*getNumber(n, length - i))
+    for(i in 0..(length-1)/2){
+        if(i == length - i - 1) res += mypow(10, i)*getNumber(n, i)
+        else res += (mypow(10, length - i - 1)*getNumber(n, i) + mypow(10, i)*getNumber(n, length - i - 1))
     }
-    return res/10
+    return res
 }
 
 /**

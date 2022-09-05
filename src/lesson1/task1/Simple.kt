@@ -65,9 +65,7 @@ fun main() {
  * Пользователь задает время в часах, минутах и секундах, например, 8:20:35.
  * Рассчитать время в секундах, прошедшее с начала суток (30035 в данном случае).
  */
-fun seconds(hours: Int, minutes: Int, seconds: Int): Int {
-	return hours * 3600 + minutes * 60 + seconds
-}
+fun seconds(hours: Int, minutes: Int, seconds: Int): Int = hours * 3600 + minutes * 60 + seconds
 
 /**
  * Тривиальная (1 балл)
@@ -118,10 +116,8 @@ fun thirdDigit(number: Int): Int {
  * Определите время поезда в пути в минутах (в данном случае 216).
  */
 fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int {
-    if(hoursArrive < hoursDepart)
-		return (hoursArrive + 24) * 60 + minutesArrive - (hoursDepart * 60 + minutesDepart)
-    else
-    	return hoursArrive * 60 + minutesArrive - (hoursDepart * 60 + minutesDepart)    
+    if(hoursArrive < hoursDepart) return (hoursArrive + 24) * 60 + minutesArrive - (hoursDepart * 60 + minutesDepart)
+    return hoursArrive * 60 + minutesArrive - (hoursDepart * 60 + minutesDepart)    
 }
 
 /**
@@ -132,7 +128,7 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
  * Например, 100 рублей под 10% годовых превратятся в 133.1 рубля
  */
 fun accountInThreeYears(initial: Int, percent: Int): Double {
-	val p: Double = (100.0 + percent) / 100.0
+	val p = (100.0 + percent) / 100.0
 	return initial * p * p * p
 }
 
@@ -143,6 +139,5 @@ fun accountInThreeYears(initial: Int, percent: Int): Double {
  * Необходимо вывести число, полученное из заданного перестановкой цифр в обратном порядке (например, 874).
  */
 fun numberRevert(number: Int): Int {
-	val n = number
-	return (n % 10 * 100) + (n / 10 % 10 * 10) + (n / 100)
+	return (number % 10 * 100) + (number / 10 % 10 * 10) + (number / 100)
 }
