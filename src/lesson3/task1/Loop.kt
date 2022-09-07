@@ -288,6 +288,11 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
+fun fact(num: Int): Int {
+    var result = 1
+    for (i in 2..num) result *= i
+    return result
+}
 fun sin(x: Double, eps: Double): Double = TODO()
 
 /**
