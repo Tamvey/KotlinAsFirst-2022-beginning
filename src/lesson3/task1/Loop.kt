@@ -76,7 +76,7 @@ fun digitNumber(n: Int): Int {
     if(n == 0) return 1
     var amountOfNumbers = 0
     var counter = 1
-    while(n / counter != 0){
+    while(n / counter != 0 && amountOfNumbers < 10){
 		amountOfNumbers++
 		counter *= 10
     }
@@ -90,11 +90,17 @@ fun digitNumber(n: Int): Int {
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
 fun fib(n: Int): Int {
-    val allNumbers: Array<Int> = Array(n+1, {1})
-    for (i in 3..n){
-        allNumbers[i] = allNumbers[i - 1] + allNumbers[i - 2]
+    var first = 1
+    var second = 1
+    var been = 2
+    if(n in 1..2) return 1
+    while(n - been != 0){
+        var new = first + second
+        first = second
+        second = new
+        been++
     }
-    return allNumbers[n]
+    return second
 }
 
 /**
@@ -212,8 +218,9 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun mypow(number: Int, times: Int) : Int{
-    if(times == 0) return 1
-    return number * mypow(number, times - 1)
+    var res = 1
+    for(i in 0..times-1){res *= 10}
+    return res
 }
 fun getNumber(number: Int, place: Int) : Int{
     return number / mypow(10, place) % 10
@@ -231,9 +238,9 @@ fun revert(n: Int): Int {
      */
     var length = getLength(n)
     var res = 0
-    for(i in 0..(length-1)/2){
-        if(i == length - i - 1) res += mypow(10, i)*getNumber(n, i)
-        else res += (mypow(10, length - i - 1)*getNumber(n, i) + mypow(10, i)*getNumber(n, length - i - 1))
+    for(i in 0..(length - 1) / 2){
+        if(i == length - i - 1) res += mypow(10, i) * getNumber(n, i)
+        else res += (mypow(10, length - i - 1) * getNumber(n, i) + mypow(10, i) * getNumber(n, length - i - 1))
     }
     return res
 }
@@ -303,7 +310,16 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int {
+    var now = 1
+    var been = 0
+    while(been + getLength(now * now) < n){
+        been += getLength(now * now)
+        now++
+    }
+    been += getLength(now * now)
+    return getNumber(now * now, been - n)
+}
 
 /**
  * Сложная (5 баллов)
@@ -314,4 +330,13 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int {
+    var now = 1
+    var been = 0
+    while(been + getLength(fib(now)) < n){
+        been += getLength(fib(now))
+        now++
+    }
+    been += getLength(fib(now))
+    return getNumber(fib(now), been - n)
+}
