@@ -278,7 +278,7 @@ fun convertToString(n: Int, base: Int): String{
     var converted = convert(n, base)
     var res = ""
     for(i in converted){
-        if(i >= 9) res += "${alph[i % base + 10 * (i / base - 1)]}"
+        if(i > 9) res += "${alph[i % base + 10 * (i / base - 1)]}"
         else res += "$i"
     }
     return res
@@ -398,7 +398,7 @@ fun secondThree(n: Int): String{
     var res = ""
     var ed = listOf("одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
     var special = listOf(
-        "десять", "одинадцать", "двенадцать", "тринадцать", "четырнадцать",
+        "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать",
         "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
     )
     var des = listOf("двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто")
