@@ -73,10 +73,10 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
-    if(n == 0) return 1
+    if (n == 0) return 1
     var amountOfNumbers = 0
     var counter = 1
-    while(n / counter != 0 && amountOfNumbers < 10){
+    while (n / counter != 0 && amountOfNumbers < 10) {
 		amountOfNumbers++
 		counter *= 10
     }
@@ -93,8 +93,8 @@ fun fib(n: Int): Int {
     var first = 1
     var second = 1
     var been = 2
-    if(n in 1..2) return 1
-    while(n - been != 0){
+    if (n in 1..2) return 1
+    while (n - been != 0) {
         var new = first + second
         first = second
         second = new
@@ -110,7 +110,7 @@ fun fib(n: Int): Int {
  */
 fun minDivisor(n: Int): Int {
     var c: Int = 2
-    while(n % c != 0){
+    while (n % c != 0) {
         c++
     }
     return c
@@ -122,9 +122,9 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    var c: Int = n - 1
-    while(c != 0){
-        if(n % c == 0) break
+    var c = n - 1
+    while (c != 0) {
+        if (n % c == 0) break
         c--
     }
     return c
@@ -147,10 +147,10 @@ fun maxDivisor(n: Int): Int {
  * этого для какого-либо начального X > 0.
  */
 fun collatzSteps(x: Int): Int {
-	var counter: Int = 0
+	var counter = 0
     var x1 = x
-    while(x1 != 1){
-   		if(x1 % 2 == 0) x1 /= 2
+    while (x1 != 1) {
+   		if (x1 % 2 == 0) x1 /= 2
         else x1 = 3 * x1 + 1
         counter++
     }
@@ -163,40 +163,30 @@ fun collatzSteps(x: Int): Int {
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun totalMultiplier(x: Int, y: Int): Int{
+fun totalMultiplier(x: Int, y: Int): Int {
 	var res = 1
 	var minn = min(x, y)
 	var maxx = max(x, y)
     val to = floor(sqrt(minn*1.0))
-	for(n in 1..to.toInt()){
-		if(minn % n == 0 && maxx % n == 0) res *= n
+	for (n in 1..to.toInt()) {
+		if (minn % n == 0 && maxx % n == 0) res *= n
         if (n == minn / n) break
-		if( (maxx % (minn / n) == 0) && (minn % (minn / n) == 0) )  res *= (minn / n)
+		if ( (maxx % (minn / n) == 0) && (minn % (minn / n) == 0) )  res *= (minn / n)
 	}
 	return res
 }
-fun lcm(m: Int, n: Int): Int{
-	/* y - общий множитель
- 	* m = x * y^i
- 	* n = z * y^j
- 	* k = x * z * y^max(i, j)
- 	* */
-    if(m == n) return m
-	var res = 1	
-    val inCommon = totalMultiplier(m, n)
-    var m1 = m
-    var n1 = n
-   	while ((m1 % inCommon == 0 || n1 % inCommon == 0) && inCommon != 1){
-    	if(m1 % inCommon == 0) {m1 /= inCommon}
-        if(n1 % inCommon == 0) {n1 /= inCommon}
-        res *= inCommon
+fun nok(a: Int, b: Int): Int {
+    var a1 = a
+    var b1 = b
+    while (a1 != 0 && b1 != 0) {
+        if (a1 > b1) a1 %= b1
+        else b1 %= a1
     }
-    //println(m1)
-    //println(n1)
-    //println(res)
-    res *= m1 * n1
-    return res
+    return max(a1, b1)
 }
+
+fun lcm(m: Int, n: Int) = n * m / nok(m, n)
+
 
 /**
  * Средняя (3 балла)
@@ -205,10 +195,8 @@ fun lcm(m: Int, n: Int): Int{
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int): Boolean {
-    //println(totalMultiplier(m, n))
-    return (totalMultiplier(m, n) == 1)
-}
+fun isCoPrime(m: Int, n: Int) = (totalMultiplier(m, n) == 1)
+
 
 /**
  * Средняя (3 балла)
@@ -217,17 +205,16 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun mypow(number: Int, times: Int) : Int{
+fun mypow(number: Int, times: Int): Int {
     var res = 1
-    for(i in 0..times-1){res *= 10}
+    for (i in 0..times-1) {res *= 10}
     return res
 }
-fun getNumber(number: Int, place: Int) : Int{
-    return number / mypow(10, place) % 10
-}
-fun getLength(number: Int) : Int{
+fun getNumber(number: Int, place: Int) = number / mypow(10, place) % 10
+
+fun getLength(number: Int): Int {
 	var length = 0
-	while (number / mypow(10, length) != 0 && length < 10){length++}
+	while (number / mypow(10, length) != 0 && length < 10) {length++}
 	return length
 }
 fun revert(n: Int): Int {
@@ -238,8 +225,8 @@ fun revert(n: Int): Int {
      */
     var length = getLength(n)
     var res = 0
-    for(i in 0..(length - 1) / 2){
-        if(i == length - i - 1) res += mypow(10, i) * getNumber(n, i)
+    for (i in 0..(length - 1) / 2) {
+        if (i == length - i - 1) res += mypow(10, i) * getNumber(n, i)
         else res += (mypow(10, length - i - 1) * getNumber(n, i) + mypow(10, i) * getNumber(n, length - i - 1))
     }
     return res
@@ -256,8 +243,8 @@ fun revert(n: Int): Int {
  */
 fun isPalindrome(n: Int): Boolean {
     var length = getLength(n)
-    for(i in 0..(length-1)/2){
-        if(getNumber(n, i) != getNumber(n, length-i-1)) return false
+    for (i in 0..(length-1)/2) {
+        if (getNumber(n, i) != getNumber(n, length-i-1)) return false
     }
     return true
 }
@@ -273,8 +260,8 @@ fun isPalindrome(n: Int): Boolean {
 fun hasDifferentDigits(n: Int): Boolean {
     var length = getLength(n)
     var last = getNumber(n, 0)
-    for(i in 0..length-1){
-        if(getNumber(n, i) != last) return true
+    for (i in 0..length-1) {
+        if (getNumber(n, i) != last) return true
     }
     return false
 }
@@ -318,7 +305,7 @@ fun cos(x: Double, eps: Double): Double = TODO()
 fun squareSequenceDigit(n: Int): Int {
     var now = 1
     var been = 0
-    while(been + getLength(now * now) < n){
+    while (been + getLength(now * now) < n) {
         been += getLength(now * now)
         now++
     }
@@ -338,7 +325,7 @@ fun squareSequenceDigit(n: Int): Int {
 fun fibSequenceDigit(n: Int): Int {
     var now = 1
     var been = 0
-    while(been + getLength(fib(now)) < n){
+    while (been + getLength(fib(now)) < n) {
         been += getLength(fib(now))
         now++
     }

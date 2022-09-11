@@ -70,10 +70,9 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    if (age / 10 % 10 != 1)
-    	if(age % 10 == 1) return age.toString() + " год"
-    	else if(age % 10 in 2..4) return age.toString() + " года"
-    return age.toString() + " лет"
+    if(age / 10 % 10 != 1 && age % 10 == 1) return "$age год"
+    else if(age / 10 % 10 != 1 && age % 10 in 2..4) return "$age года"
+    return "$age лет"
 }
 
 /**
@@ -145,10 +144,11 @@ fun rookOrBishopThreatens(
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    if(a+b>c && a+c>b && b+c>a)
-    	if(a*a+b*b==c*c || b*b+c*c==a*a || c*c+a*a==b*b) return 1 else
-    	if(a*a+b*b<c*c || b*b+c*c<a*a || c*c+a*a<b*b) return 2 else return 0
-    else return -1
+    if(a+b > c && a+c > b && b+c > a)
+    	if(a*a + b*b == c*c || b*b + c*c == a*a || c*c + a*a == b*b) return 1
+    	else if(a*a + b*b < c*c || b*b + c*c < a*a || c*c + a*a < b*b) return 2
+        else return 0
+    return -1
 }
 
 /**
