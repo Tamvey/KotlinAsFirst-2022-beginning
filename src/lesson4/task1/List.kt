@@ -253,6 +253,7 @@ fun factorizeToString(n: Int): String{
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int>{
+    if (n == 0) return arrayListOf(0)
     var res: List<Int> = arrayListOf()
     var n1 = n
     while(n1 != 0){
@@ -273,7 +274,6 @@ fun convert(n: Int, base: Int): List<Int>{
  * (например, n.toString(base) и подобные), запрещается.
  */
 fun convertToString(n: Int, base: Int): String{
-    if (n == 0) return "0"
     var alph = "abcdefghijklmnopqrstuvwxyz"
     var converted = convert(n, base)
     var res = ""
@@ -378,7 +378,7 @@ fun firstThree(n: Int): String{
     var res = ""
     var ed = listOf("ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
     var special = listOf(
-        "десять", "одинадцать", "двенадцать", "тринадцать", "четырнадцать",
+        "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать",
         "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
     )
     var des = listOf("двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто")
