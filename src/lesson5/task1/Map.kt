@@ -1,7 +1,8 @@
 @file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
 
 package lesson5.task1
-
+import ru.spbstu.wheels.defaultCopy
+import kotlin.math.*
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -121,6 +122,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
+    if (a.size == 0 && b.size == 0) return true
     for(i in a){
         for(j in b){
             if (i.value == j.value && i.key == j.key) return true
@@ -157,8 +159,8 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    var res: MutableList<String> = mutableListOf()
-    for(i in a) {
+    var res: MutableSet<String> = mutableSetOf()
+    for (i in a) {
         if (b.contains(i)) res.add(i)
     }
     return res.toList()
@@ -196,7 +198,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
                 if (b.key !in res) res.put(b.key, b.value)
             }
         }
-
+        if (a.key !in res) res.put(a.key, a.value)
     }
     return res
 }
@@ -291,7 +293,7 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
  */
 fun extractRepeats(list: List<String>): Map<String, Int> {
     var res: MutableMap<String, Int> = mutableMapOf()
-    var alph = "abcdefghijklmnopqrstuvwxyz"
+    var alph = "abcdefghijklmnopqrstuvwxyz1234567890абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
     for (i in alph) {
         var counter = 0
         for (j in list) {
@@ -299,6 +301,11 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
         }
         if (counter > 1) res.put(i.toString(), counter)
     }
+    var counter = 0
+    for (j in list) {
+        if (j == "") counter++
+    }
+    if (counter > 1) res.put("", counter)
     return res
 }
 
@@ -429,7 +436,11 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         if (sortedList[i] + sortedList[list.size - 1] < number) break
         for (j in list.size - 1 downTo i + 1) {
             if (sortedList[i] + sortedList[j] < number) break
-            if (sortedList[i] + sortedList[j] == number) {res = Pair(i, j); return res}
+            if (sortedList[i] + sortedList[j] == number) {
+                res = Pair( min(list.indexOf(sortedList[i]), list.indexOf(sortedList[j])),
+                            max(list.indexOf(sortedList[i]), list.indexOf(sortedList[j])))
+                return res
+            }
         }
     }
     return res
