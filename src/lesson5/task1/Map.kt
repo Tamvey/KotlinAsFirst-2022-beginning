@@ -122,7 +122,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    if (a.size == 0 && b.size == 0) return true
+    if (a.size == 0 || b.size == 0) return true
     for(i in a){
         for(j in b){
             if (i.value == j.value && i.key == j.key) return true
@@ -185,6 +185,8 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val res: MutableMap<String, String> = mutableMapOf()
+    if (mapA.size == 0) res += mapA
+    if (mapB.size == 0) res += mapB
     for (a in mapA) {
         for (b in mapB) {
             if (a.key == b.key) {
@@ -198,7 +200,6 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
                 if (b.key !in res) res.put(b.key, b.value)
             }
         }
-        if (a.key !in res) res.put(a.key, a.value)
     }
     return res
 }
@@ -292,20 +293,14 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
 fun extractRepeats(list: List<String>): Map<String, Int> {
-    var res: MutableMap<String, Int> = mutableMapOf()
-    var alph = "abcdefghijklmnopqrstuvwxyz1234567890абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
-    for (i in alph) {
-        var counter = 0
-        for (j in list) {
-            if (i.toString() == j) counter++
+    val res: MutableMap<String, Int> = mutableMapOf()
+    for (i in list) {
+        if (i !in res.keys) {
+            var counter = 0
+            for (j in list) {if(j == i) counter++}
+            if (counter > 1) res.put(i, counter)
         }
-        if (counter > 1) res.put(i.toString(), counter)
     }
-    var counter = 0
-    for (j in list) {
-        if (j == "") counter++
-    }
-    if (counter > 1) res.put("", counter)
     return res
 }
 
@@ -430,20 +425,33 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    var sortedList = list.sorted()
-    var res: Pair<Int, Int> = Pair(-1, -1)
-    for (i in 0 .. list.size - 1) {
-        if (sortedList[i] + sortedList[list.size - 1] < number) break
-        for (j in list.size - 1 downTo i + 1) {
-            if (sortedList[i] + sortedList[j] < number) break
-            if (sortedList[i] + sortedList[j] == number) {
-                res = Pair( min(list.indexOf(sortedList[i]), list.indexOf(sortedList[j])),
-                            max(list.indexOf(sortedList[i]), list.indexOf(sortedList[j])))
-                return res
+    val bufer: MutableMap<Int, MutableList<Int>> = mutableMapOf()
+    var a = -1; var b = -1
+    for (i in list.indices) {
+        if (list[i] !in bufer.keys) {
+            bufer.put(list[i], mutableListOf<Int>(i))
+        }
+        else bufer[list[i]]?.add(i)
+    }
+    for (i in 0..number/2) {
+        if (i in bufer.keys && number - i in bufer.keys) {
+
+            var gotMas: MutableList<Int> = bufer.getValue(i)
+            if (i == number - i) {
+                if (gotMas.size >= 2) {
+                    a = gotMas[0]
+                    b = gotMas[gotMas.size - 1]
+                }
             }
+            else {
+                a = bufer.getValue(i)[0]
+                b = bufer.getValue(number - i)[0]
+                break
+            }
+
         }
     }
-    return res
+    return Pair<Int, Int>(a, b)
 }
 
 /**
