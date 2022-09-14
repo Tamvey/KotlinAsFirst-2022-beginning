@@ -109,7 +109,7 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    var c: Int = 2
+    var c = 2
     while (n % c != 0) {
         c++
     }
@@ -195,7 +195,7 @@ fun lcm(m: Int, n: Int) = n * m / nok(m, n)
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int) = (totalMultiplier(m, n) == 1)
+fun isCoPrime(m: Int, n: Int) = (nok(m, n) == 1)
 
 
 /**
@@ -212,18 +212,14 @@ fun mypow(number: Int, times: Int): Int {
 }
 fun getNumber(number: Int, place: Int) = number / mypow(10, place) % 10
 
-fun getLength(number: Int): Int {
-	var length = 0
-	while (number / mypow(10, length) != 0 && length < 10) {length++}
-	return length
-}
+
 fun revert(n: Int): Int {
     /*
      * 3 2 1 5 1
      * 
      * 4 3 2 1 0
      */
-    var length = getLength(n)
+    var length = digitNumber(n)
     var res = 0
     for (i in 0..(length - 1) / 2) {
         if (i == length - i - 1) res += mypow(10, i) * getNumber(n, i)
@@ -242,7 +238,7 @@ fun revert(n: Int): Int {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun isPalindrome(n: Int): Boolean {
-    var length = getLength(n)
+    var length = digitNumber(n)
     for (i in 0..(length-1)/2) {
         if (getNumber(n, i) != getNumber(n, length-i-1)) return false
     }
@@ -258,7 +254,7 @@ fun isPalindrome(n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun hasDifferentDigits(n: Int): Boolean {
-    var length = getLength(n)
+    var length = digitNumber(n)
     var last = getNumber(n, 0)
     for (i in 0..length-1) {
         if (getNumber(n, i) != last) return true
@@ -275,11 +271,7 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
-fun fact(num: Int): Int {
-    var result = 1
-    for (i in 2..num) result *= i
-    return result
-}
+
 fun sin(x: Double, eps: Double): Double = TODO()
 
 /**
@@ -305,11 +297,11 @@ fun cos(x: Double, eps: Double): Double = TODO()
 fun squareSequenceDigit(n: Int): Int {
     var now = 1
     var been = 0
-    while (been + getLength(now * now) < n) {
-        been += getLength(now * now)
+    while (been + digitNumber(now * now) < n) {
+        been += digitNumber(now * now)
         now++
     }
-    been += getLength(now * now)
+    been += digitNumber(now * now)
     return getNumber(now * now, been - n)
 }
 
@@ -325,10 +317,10 @@ fun squareSequenceDigit(n: Int): Int {
 fun fibSequenceDigit(n: Int): Int {
     var now = 1
     var been = 0
-    while (been + getLength(fib(now)) < n) {
-        been += getLength(fib(now))
+    while (been + digitNumber(fib(now)) < n) {
+        been += digitNumber(fib(now))
         now++
     }
-    been += getLength(fib(now))
+    been += digitNumber(fib(now))
     return getNumber(fib(now), been - n)
 }

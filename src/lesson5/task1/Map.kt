@@ -122,7 +122,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    if (a.size == 0 || b.size == 0) return true
+    if (a.size == 0) return true
     for(i in a){
         for(j in b){
             if (i.value == j.value && i.key == j.key) return true
@@ -185,8 +185,8 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val res: MutableMap<String, String> = mutableMapOf()
-    if (mapA.size == 0) res += mapA
-    if (mapB.size == 0) res += mapB
+    if (mapA.size == 0) return mapB
+    if (mapB.size == 0) return mapA
     for (a in mapA) {
         for (b in mapB) {
             if (a.key == b.key) {
@@ -275,7 +275,11 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     for (i in word) {
-        if (i !in chars) return false
+        var been = 0
+        for (j in chars) {
+            if (i.lowercase() == j.lowercase()) {been = 1; break}
+        }
+        if (been == 0) return false
     }
     return true
 }
@@ -475,4 +479,49 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    var all: MutableList<MutableSet<String>> = mutableListOf()
+    var vals: MutableList<Int> = mutableListOf()
+    var mas: MutableList<Int> = mutableListOf()
+    for (i in 0..capacity) {all.add(mutableSetOf<String>()); mas.add(0); vals.add(0)}
+    for (i in 0..capacity) {
+        // Поиск самого выгодного единичного элемента
+        for (j in treasures.keys) {
+            var nowEl = treasures.getValue(j)
+            if (nowEl.second >= vals[i]) {
+                if (nowEl.second > vals[i] && nowEl.first <= i) {
+                    vals[i] = nowEl.second
+                    mas[i] = nowEl.first
+                    all[i] = mutableSetOf(j)
+                }
+                if (nowEl.second == vals[i] && nowEl.first < mas[i]) {
+                    vals[i] = nowEl.second
+                    mas[i] = nowEl.first
+                    all[i] = mutableSetOf(j)
+                }
+            }
+        }
+        // Основной алгоритм
+        for (n in i - 1 downTo 1) {
+
+            for (some in treasures.keys) {
+                var nowEl = treasures.getValue(some)
+                if (vals[n] + nowEl.second > vals[i] && mas[n] + nowEl.first <= mas[i] && some !in all[n]) {
+                    mas[i] = mas[n] + nowEl.first
+                    vals[i] = vals[n] + nowEl.second
+                    all[i] = all[n]
+                    all[i].add(some)
+                }
+                if (vals[n] + nowEl.second == vals[i] && mas[n] + nowEl.first < mas[i] && some !in all[n]) {
+                    mas[i] = mas[n] + nowEl.first
+                    vals[i] = vals[n] + nowEl.second
+                    all[i] = all[n]
+                    all[i].add(some)
+                }
+            }
+
+        }
+
+    }
+    return all[capacity]
+}

@@ -43,7 +43,7 @@ fun daysInMonth(month: Int, year: Int): Int {
     else if (month == 2 && year % 100 != 0 && year % 4 == 0) return 29
     else if (month == 2) return 28
     else if (month in arrayOf(1, 3, 5, 7, 8, 10, 12)) return 31
-    else return 30
+    return 30
 }
 
 
@@ -70,7 +70,7 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    val maxx = max(max(a, b), c)
-    val minn = min(min(a, b), c)
+    val maxx = maxOf(a, b, c)
+    val minn = minOf(a, b, c)
     return (a + b + c - minn - maxx <= max(r, s) && minn <= min(r, s))
 }
