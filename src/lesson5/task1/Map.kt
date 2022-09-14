@@ -253,8 +253,8 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
     var been = false
     for (i in stuff) {
         if (i.value.first == kind) {
-            been = true
-            if (i.value.second < amount && amount == 0.0) {
+            if (i.value.second < amount || been == false) {
+                been = true
                 amount = i.value.second
                 name = i.key
             }
@@ -500,7 +500,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             }
         }
         // Основной алгоритм
-        for (n in i - 1 downTo 1) {
+        for (n in i downTo 1) {
 
             for (some in treasures.keys) {
                 var nowEl = treasures.getValue(some)
