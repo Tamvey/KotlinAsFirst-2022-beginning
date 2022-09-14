@@ -125,7 +125,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
     if (a.size == 0) return true
     for(i in a){
         for(j in b){
-            if (i.value == j.value && i.key == j.key) return true
+            if (i.value == j.value && i.key == j.key && i.key != "" && i.value != "") return true
         }
     }
     return false
@@ -249,12 +249,12 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
     var name = ""
-    var amount = Double.MAX_VALUE
+    var amount = 0.0
     var been = false
     for (i in stuff) {
         if (i.value.first == kind) {
             been = true
-            if (i.value.second < amount) {
+            if (i.value.second < amount && amount == 0.0) {
                 amount = i.value.second
                 name = i.key
             }
@@ -488,17 +488,15 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         // Поиск самого выгодного единичного элемента
         for (j in treasures.keys) {
             var nowEl = treasures.getValue(j)
-            if (nowEl.second >= vals[i]) {
-                if (nowEl.second > vals[i] && nowEl.first <= i) {
-                    vals[i] = nowEl.second
-                    mas[i] = nowEl.first
-                    all[i] = mutableSetOf(j)
-                }
-                if (nowEl.second == vals[i] && nowEl.first < mas[i]) {
-                    vals[i] = nowEl.second
-                    mas[i] = nowEl.first
-                    all[i] = mutableSetOf(j)
-                }
+            if (nowEl.second > vals[i] && nowEl.first <= i) {
+                vals[i] = nowEl.second
+                mas[i] = nowEl.first
+                all[i] = mutableSetOf(j)
+            }
+            if (nowEl.second == vals[i] && nowEl.first < mas[i]) {
+                vals[i] = nowEl.second
+                mas[i] = nowEl.first
+                all[i] = mutableSetOf(j)
             }
         }
         // Основной алгоритм
@@ -506,7 +504,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
 
             for (some in treasures.keys) {
                 var nowEl = treasures.getValue(some)
-                if (vals[n] + nowEl.second > vals[i] && mas[n] + nowEl.first <= mas[i] && some !in all[n]) {
+                if (vals[n] + nowEl.second > vals[i] && mas[n] + nowEl.first <= i && some !in all[n]) {
                     mas[i] = mas[n] + nowEl.first
                     vals[i] = vals[n] + nowEl.second
                     all[i] = all[n]
