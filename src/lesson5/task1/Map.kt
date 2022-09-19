@@ -1,8 +1,10 @@
 @file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
 
 package lesson5.task1
+
 import ru.spbstu.wheels.defaultCopy
 import kotlin.math.*
+
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -101,8 +103,11 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     var v: MutableList<MutableList<String>> = mutableListOf()
     var k: MutableList<Int> = mutableListOf()
     for (i in grades) {
-        if (i.value !in k) {k.add(i.value); v.add(mutableListOf(i.key))}
-        else {v[k.indexOf(i.value)].add(i.key)}
+        if (i.value !in k) {
+            k.add(i.value); v.add(mutableListOf(i.key))
+        } else {
+            v[k.indexOf(i.value)].add(i.key)
+        }
     }
     var res: MutableMap<Int, List<String>> = mutableMapOf()
     for (i in 0..k.size - 1) {
@@ -123,8 +128,8 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
     if (a.size == 0) return true
-    for(i in a){
-        for(j in b){
+    for (i in a) {
+        for (j in b) {
             if (i.value == j.value && i.key == j.key && i.key != "" && i.value != "") return true
         }
     }
@@ -146,7 +151,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  *     -> a changes to mutableMapOf() aka becomes empty
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
-    for(j in b) {
+    for (j in b) {
         if (a.containsKey(j.key) && b[j.key] == a[j.key]) a.remove(j.key)
     }
 }
@@ -192,10 +197,8 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
             if (a.key == b.key) {
                 if (a.value != b.value) {
                     res.put(a.key, "${a.value}, ${b.value}")
-                }
-                else res.put(a.key, a.value)
-            }
-            else {
+                } else res.put(a.key, a.value)
+            } else {
                 if (a.key !in res) res.put(a.key, a.value)
                 if (b.key !in res) res.put(b.key, b.value)
             }
@@ -219,8 +222,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
     for ((a, b) in stockPrices) {
         if (a !in res.keys) {
             res.put(a, mutableListOf(b, 1.0))
-        }
-        else {
+        } else {
             res.getValue(a)[0] += b
             res.getValue(a)[1] += 1.0
         }
@@ -260,7 +262,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
             }
         }
     }
-    if (been == true) return  name
+    if (been == true) return name
     return null
 }
 
@@ -277,7 +279,9 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     for (i in word) {
         var been = 0
         for (j in chars) {
-            if (i.lowercase() == j.lowercase()) {been = 1; break}
+            if (i.lowercase() == j.lowercase()) {
+                been = 1; break
+            }
         }
         if (been == 0) return false
     }
@@ -301,7 +305,9 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
     for (i in list) {
         if (i !in res.keys) {
             var counter = 0
-            for (j in list) {if(j == i) counter++}
+            for (j in list) {
+                if (j == i) counter++
+            }
             if (counter > 1) res.put(i, counter)
         }
     }
@@ -332,13 +338,14 @@ fun giveAmountOfLetters(word: String): Map<String, Int> {
     }
     return res
 }
+
 fun hasAnagrams(words: List<String>): Boolean {
     for (i in 0..words.size - 2) {
         for (j in i + 1..words.size - 1) {
             if (words[j].length == words[i].length &&
                 giveAmountOfLetters(words[j]) == giveAmountOfLetters(words[i])
             )
-            return true
+                return true
         }
     }
     return false
@@ -381,13 +388,15 @@ fun hasAnagrams(words: List<String>): Boolean {
 fun getAllFriends(name: String, friends: Map<String, Set<String>>): Set<String> {
     val res: MutableSet<String> = mutableSetOf()
     var now: MutableSet<String> = mutableSetOf()
-    if(friends.containsKey(name)) now = friends.getValue(name).toMutableSet()
+    if (friends.containsKey(name)) now = friends.getValue(name).toMutableSet()
     while (true) {
         var new: MutableSet<String> = mutableSetOf()
         for (j in now) {
             if (j !in res) {
                 if (j != name) res.add(j)
-                if (friends.containsKey(j) == true) {new += friends.getValue(j)}
+                if (friends.containsKey(j) == true) {
+                    new += friends.getValue(j)
+                }
             }
         }
         if (new.size == 0) break
@@ -395,6 +404,7 @@ fun getAllFriends(name: String, friends: Map<String, Set<String>>): Set<String> 
     }
     return res
 }
+
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     var res: MutableMap<String, Set<String>> = mutableMapOf()
     // Определение всех людей
@@ -430,14 +440,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val bufer: MutableMap<Int, MutableList<Int>> = mutableMapOf()
-    var a = -1; var b = -1
+    var a = -1;
+    var b = -1
     for (i in list.indices) {
         if (list[i] !in bufer.keys) {
             bufer.put(list[i], mutableListOf<Int>(i))
-        }
-        else bufer[list[i]]?.add(i)
+        } else bufer[list[i]]?.add(i)
     }
-    for (i in 0..number/2) {
+    for (i in 0..number / 2) {
         if (i in bufer.keys && number - i in bufer.keys) {
 
             var gotMas: MutableList<Int> = bufer.getValue(i)
@@ -446,8 +456,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
                     a = gotMas[0]
                     b = gotMas[gotMas.size - 1]
                 }
-            }
-            else {
+            } else {
                 a = bufer.getValue(i)[0]
                 b = bufer.getValue(number - i)[0]
                 break
@@ -483,7 +492,9 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     var all: MutableList<MutableSet<String>> = mutableListOf()
     var vals: MutableList<Int> = mutableListOf()
     var mas: MutableList<Int> = mutableListOf()
-    for (i in 0..capacity) {all.add(mutableSetOf<String>()); mas.add(0); vals.add(0)}
+    for (i in 0..capacity) {
+        all.add(mutableSetOf<String>()); mas.add(0); vals.add(0)
+    }
     for (i in 0..capacity) {
         // Поиск самого выгодного единичного элемента
         for (j in treasures.keys) {

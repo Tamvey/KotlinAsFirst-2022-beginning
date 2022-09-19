@@ -77,8 +77,8 @@ fun digitNumber(n: Int): Int {
     var amountOfNumbers = 0
     var counter = 1
     while (n / counter != 0 && amountOfNumbers < 10) {
-		amountOfNumbers++
-		counter *= 10
+        amountOfNumbers++
+        counter *= 10
     }
     return amountOfNumbers
 }
@@ -147,10 +147,10 @@ fun maxDivisor(n: Int): Int {
  * этого для какого-либо начального X > 0.
  */
 fun collatzSteps(x: Int): Int {
-	var counter = 0
+    var counter = 0
     var x1 = x
     while (x1 != 1) {
-   		if (x1 % 2 == 0) x1 /= 2
+        if (x1 % 2 == 0) x1 /= 2
         else x1 = 3 * x1 + 1
         counter++
     }
@@ -164,17 +164,18 @@ fun collatzSteps(x: Int): Int {
  * минимальное число k, которое делится и на m и на n без остатка
  */
 fun totalMultiplier(x: Int, y: Int): Int {
-	var res = 1
-	var minn = min(x, y)
-	var maxx = max(x, y)
-    val to = floor(sqrt(minn*1.0))
-	for (n in 1..to.toInt()) {
-		if (minn % n == 0 && maxx % n == 0) res *= n
+    var res = 1
+    var minn = min(x, y)
+    var maxx = max(x, y)
+    val to = floor(sqrt(minn * 1.0))
+    for (n in 1..to.toInt()) {
+        if (minn % n == 0 && maxx % n == 0) res *= n
         if (n == minn / n) break
-		if ( (maxx % (minn / n) == 0) && (minn % (minn / n) == 0) )  res *= (minn / n)
-	}
-	return res
+        if ((maxx % (minn / n) == 0) && (minn % (minn / n) == 0)) res *= (minn / n)
+    }
+    return res
 }
+
 fun nok(a: Int, b: Int): Int {
     var a1 = a
     var b1 = b
@@ -207,9 +208,12 @@ fun isCoPrime(m: Int, n: Int) = (nok(m, n) == 1)
  */
 fun mypow(number: Int, times: Int): Int {
     var res = 1
-    for (i in 0..times-1) {res *= 10}
+    for (i in 0..times - 1) {
+        res *= 10
+    }
     return res
 }
+
 fun getNumber(number: Int, place: Int) = number / mypow(10, place) % 10
 
 
@@ -239,8 +243,8 @@ fun revert(n: Int): Int {
  */
 fun isPalindrome(n: Int): Boolean {
     var length = digitNumber(n)
-    for (i in 0..(length-1)/2) {
-        if (getNumber(n, i) != getNumber(n, length-i-1)) return false
+    for (i in 0..(length - 1) / 2) {
+        if (getNumber(n, i) != getNumber(n, length - i - 1)) return false
     }
     return true
 }
@@ -256,7 +260,7 @@ fun isPalindrome(n: Int): Boolean {
 fun hasDifferentDigits(n: Int): Boolean {
     var length = digitNumber(n)
     var last = getNumber(n, 0)
-    for (i in 0..length-1) {
+    for (i in 0..length - 1) {
         if (getNumber(n, i) != last) return true
     }
     return false

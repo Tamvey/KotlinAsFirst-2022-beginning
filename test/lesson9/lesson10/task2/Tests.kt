@@ -1,5 +1,7 @@
-package lesson10.task2
+package lesson9.lesson10.task2
 
+import lesson10.task2.convertToHtmlTable
+import lesson10.task2.convertToHtmlTableUsingKotlinxHtml
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -33,7 +35,7 @@ class Tests {
     @Test
     @Tag("Example")
     fun generateSimpleHtml() {
-        assertEquals("<html><body>Hello!</body></html>", generateSimpleHtml("Hello!"))
+        assertEquals("<html><body>Hello!</body></html>", lesson10.task2.generateSimpleHtml("Hello!"))
     }
 
     @Test
@@ -48,7 +50,8 @@ class Tests {
                          <li>Omega</li>
                      </ol>
                   </body></html>
-            """.trimIndent().replace("[\\r\\n ]".toRegex(), ""), generateListHtml(listOf("Alpha", "Beta", "Omega"))
+            """.trimIndent().replace("[\\r\\n ]".toRegex(), ""),
+            lesson10.task2.generateListHtml(listOf("Alpha", "Beta", "Omega"))
         )
     }
 }

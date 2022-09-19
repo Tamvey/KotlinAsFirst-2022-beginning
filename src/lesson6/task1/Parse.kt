@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -74,7 +76,28 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    var res = str.split(" ").toMutableList()
+    var months = listOf(
+        "января", "февраля", "марта", "апреля", "мая", "июня",
+        "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    )
+    var ans = ""
+    try {
+        if (res.get(1) !in months || res.get(0).toInt() !in 1..31 || res.size > 3) {
+            return ans
+        }
+        if (daysInMonth(months.indexOf(res.get(1)) + 1, res.get(2).toInt()) < res.get(0).toInt()) return ans
+        if (res[0].length == 1) res[0] = "0" + res[0]
+        ans += res[0] + "."
+        if ((months.indexOf(res[1]) + 1).toString().length == 1) ans += "0" + (months.indexOf(res[1]) + 1).toString()
+        else ans += (months.indexOf(res[1]) + 1).toString()
+        ans += "." + res[2]
+    } catch (e: Exception) {
+        return ans
+    }
+    return ans
+}
 
 /**
  * Средняя (4 балла)
@@ -86,7 +109,25 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    var ans = ""
+    var res = digital.split(".")
+    var months = listOf(
+        "января", "февраля", "марта", "апреля", "мая", "июня",
+        "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    )
+    try {
+        if (res.get(1).toInt() !in 1..12 || res.get(0).toInt() !in 1..31 || res.size > 3) {
+            return ans
+        }
+        if (daysInMonth(res.get(1).toInt(), res.get(2).toInt()) < res.get(0).toInt()) return ans
+        ans = "${res.get(0).toInt()} ${months[res.get(1).toInt() - 1]} ${res.get(2).toInt()}"
+    } catch (e: Exception) {
+        return ans
+    }
+
+    return ans
+}
 
 /**
  * Средняя (4 балла)
@@ -102,7 +143,27 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun countSymbols(n: String, c: Char): Int {
+    var res = 0
+    for (i in n) {
+        if (i == c) res++
+    }
+    return res
+}
+
+fun flattenPhoneNumber(phone: String): String {
+    var possibleSymbols = "0123456789-+() "
+    var symbolsToInclude = "0123456789+"
+    var res = ""
+    if ("()" in phone) return ""
+    for (i in phone) {
+        if (i !in possibleSymbols) return ""
+        if (i in symbolsToInclude) res += i
+    }
+    if (countSymbols(res, '+') > 1 || (countSymbols(res, '+') == 1 && res[0] != '+')) return ""
+    if (countSymbols(res, '(') != countSymbols(res, ')')) return ""
+    return res
+}
 
 /**
  * Средняя (5 баллов)
@@ -114,7 +175,20 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    var ans = -1
+    var now = ""
+    for (j in jumps) {
+        if (j !in "0123456789-% ") return -1
+        if (j in "0123456789") now += j
+        else {
+            if (now.length != 0) ans = maxOf(now.toInt(), ans)
+            now = ""
+        }
+    }
+    if (now.length != 0) ans = maxOf(now.toInt(), ans)
+    return ans
+}
 
 /**
  * Сложная (6 баллов)
@@ -127,7 +201,25 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    var now = jumps.split(" ")
+    var res = -1
+    if (now.size % 2 == 1) return res
+    for (i in 0 until now.size) {
+        for (j in "01234567890") {
+            if (i % 2 == 1 && j in now[i]) return res
+        }
+        for (j in "-+%") {
+            if (i % 2 == 0 && j in now[i]) return res
+        }
+    }
+    for (i in 0 until now.size step 2) {
+        if (now[i + 1][0] == '+') {
+            res = maxOf(res, now[i].toInt())
+        }
+    }
+    return res
+}
 
 /**
  * Сложная (6 баллов)
@@ -138,7 +230,30 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    var res = expression.split(" ")
+    var ans = 0
+    // Проверка на верность чередования чисел и арифмет. действий
+    for (i in 1..res.size - 1) {
+        if (("+" in res[i] || "-" in res[i]) && ("+" in res[i - 1] || "-" in res[i - 1])) throw IllegalArgumentException()
+        if (!("+" in res[i] || "-" in res[i]) && !("+" in res[i - 1] || "-" in res[i - 1])) throw IllegalArgumentException()
+    }
+    // Проверка на наличие допустимых знаков
+    for (j in res) {
+        for (i in j) {
+            if (i !in "0123456789+-") throw IllegalArgumentException()
+        }
+    }
+    // Если первый или второй элемент в res - арифметю опер.
+    if (("+" in res[0] || "-" in res[0]) || ("+" in res[res.size - 1] || "-" in res[res.size - 1])) throw IllegalArgumentException()
+    // Вычисления 8
+    ans = res[0].toInt()
+    for (i in 2..res.size - 1 step 2) {
+        if (res[i - 1] == "+") ans += res[i].toInt()
+        if (res[i - 1] == "-") ans -= res[i].toInt()
+    }
+    return ans
+}
 
 /**
  * Сложная (6 баллов)
@@ -149,7 +264,21 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    var res = str.split(" ")
+    var ans = -1
+    for (i in 0 until res.size - 1) {
+        if (res[i].lowercase() == res[i + 1].lowercase()) {
+            for (k in 0 until i) {
+                ans += res[k].length
+                ans++
+            }
+            ans += 1
+            return ans
+        }
+    }
+    return ans
+}
 
 /**
  * Сложная (6 баллов)
@@ -162,7 +291,23 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше нуля либо равны нулю.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    var res = description.split(";")
+    var nameOfMax = ""
+    var valueOfMax = 0.0
+    for (i in res) {
+        var now = i.split(" ").toMutableList()
+        while ("" in now) now.remove("")
+        if (now.size < 2) return nameOfMax
+        try {
+            if (now[1].toDouble() > valueOfMax) {
+                valueOfMax = now[1].toDouble()
+                nameOfMax = now[0]
+            }
+        } catch (e : Exception) {return ""}
+    }
+    return nameOfMax
+}
 
 /**
  * Сложная (6 баллов)
