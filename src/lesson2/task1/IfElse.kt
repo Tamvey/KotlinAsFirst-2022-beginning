@@ -1,6 +1,6 @@
 @file:Suppress("UNUSED_PARAMETER")
 
-package lesson3.task1.lesson2.task1
+package lesson2.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.max
