@@ -2,7 +2,7 @@
 
 package lesson6.task1
 
-import lesson3.task1.lesson2.task2.daysInMonth
+import lesson2.task2.daysInMonth
 
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
