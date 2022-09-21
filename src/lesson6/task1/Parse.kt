@@ -294,7 +294,7 @@ fun firstDuplicateIndex(str: String): Int {
 fun mostExpensive(description: String): String {
     var res = description.split(";")
     var nameOfMax = ""
-    var valueOfMax = 0.0
+    var valueOfMax = Double.MIN_VALUE
     for (i in res) {
         var now = i.split(" ").toMutableList()
         while ("" in now) now.remove("")
@@ -351,6 +351,7 @@ fun fromRoman(roman: String): Int {
         if (i == 'M') res += 1000
         else return -1
     }
+    if (res == 0) return -1
     return res
 }
 
