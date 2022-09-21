@@ -2,7 +2,7 @@
 
 package lesson6.task1
 
-import lesson2.task2.daysInMonth
+import lesson3.task1.lesson2.task2.daysInMonth
 
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
@@ -320,7 +320,39 @@ fun mostExpensive(description: String): String {
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    var ed = listOf("I", "II", "III", "IV", " ", "VI", "VII", "VIII", "IX").reversed()
+    var des = listOf("X", "XX", "XXX", "XL", " ", "LX", "LXX", "LXXX", "XC").reversed()
+    var sot = listOf("C", "CC", "CCC", "CD", " ", "DC", "DCC", "DCCC", "CM").reversed()
+    var res = 0
+    var copy = roman
+    for (i in ed.indices) {
+        if (ed[i] in copy) {
+            res += (9 - i)
+            copy = copy.replace(ed[i], "")
+        }
+    }
+    if ('V' in copy) {res += 5; copy = copy.replace("V", "")}
+    for (i in ed.indices) {
+        if (des[i] in copy) {
+            res += (9 - i) * 10
+            copy = copy.replace(des[i], "")
+        }
+    }
+    if ('L' in copy) {res += 50; copy = copy.replace("L", "")}
+    for (i in ed.indices) {
+        if (sot[i] in copy) {
+            res += (9 - i) * 100
+            copy = copy.replace(sot[i], "")
+        }
+    }
+    if ('D' in copy) {res += 500; copy = copy.replace("D", "")}
+    for (i in copy) {
+        if (i == 'M') res += 1000
+        else return -1
+    }
+    return res
+}
 
 /**
  * Очень сложная (7 баллов)
@@ -358,4 +390,92 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+// Find place of ]
+fun getOut(st: String, now: Int): Int {
+    var res = -1
+    var stack: MutableList<Char> = mutableListOf()
+
+    for (i in st.indices) {
+        if (st[i] == '[') {
+            stack += '['
+            if (i == now) res = stack.size
+        }
+        if (st[i] == ']') {
+            if (stack.size == res) return i
+            stack -= '['
+        }
+    }
+    return res
+}
+// Find place of [
+fun getIn(st: String, now: Int): Int {
+    var res = -1
+    var stack: MutableList<Char> = mutableListOf()
+    var places: MutableList<Int> = mutableListOf()
+    var place = 0
+    for (i in st.indices) {
+        if (st[i] == '[') {
+            stack += '['
+            places += i
+        }
+        if (st[i] == ']') {
+            if (i == now) {
+                return places[places.size - 1]
+            }
+            stack -= '['
+            places.removeAt(places.size - 1)
+        }
+    }
+    return res
+}
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    var res: MutableList<Int> = mutableListOf()
+    for (i in 1..cells) res.add(0)
+    // Check symbols
+    var possibleSymbols = "><+-[] "
+    for (j in commands) {
+        if (j !in possibleSymbols) throw IllegalArgumentException()
+    }
+    // Check if '[' and ']' situated correctly
+    var stack: MutableList<Char> = mutableListOf()
+    for (i in commands) {
+        if (i == '[') stack += '['
+        if (i == ']') {
+            if (stack.size == 0) throw IllegalArgumentException()
+            else stack -= '['
+        }
+    }
+    if (stack.size != 0) throw IllegalArgumentException()
+    // Solution
+    var nowPlace = cells / 2
+    var commandsHasBeenDone = 0
+    var placeInCommands = 0
+    while (true) {
+        if (commandsHasBeenDone >= limit || placeInCommands >= commands.length) break
+
+        if (commands[placeInCommands] == ' ') {}
+        else if (commands[placeInCommands] == '-') {
+            res[nowPlace] -= 1
+        }
+        else if (commands[placeInCommands] == '+') {
+            res[nowPlace] += 1
+        }
+        else if (commands[placeInCommands] == '<') {
+            nowPlace -= 1
+            if (nowPlace >= cells || nowPlace < 0) throw IllegalStateException()
+        }
+        else if (commands[placeInCommands] == '>') {
+            nowPlace += 1
+            if (nowPlace >= cells || nowPlace < 0) throw IllegalStateException()
+        }
+        else if (commands[placeInCommands] == '[') {
+            if (res[nowPlace] == 0) placeInCommands = getOut(commands, placeInCommands)
+        }
+        else if (commands[placeInCommands] == ']') {
+            if (res[nowPlace] != 0) placeInCommands = getIn(commands, placeInCommands)
+        }
+        placeInCommands++
+        commandsHasBeenDone++
+    }
+    return res
+}

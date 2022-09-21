@@ -1,6 +1,6 @@
 @file:Suppress("UNUSED_PARAMETER")
 
-package lesson2.task1
+package lesson3.task1.lesson2.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.max
@@ -69,10 +69,10 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String {
-    if (age / 10 % 10 != 1 && age % 10 == 1) return "$age год"
-    else if (age / 10 % 10 != 1 && age % 10 in 2..4) return "$age года"
-    return "$age лет"
+fun ageDescription(age: Int) = when {
+    (age / 10 % 10 != 1 && age % 10 == 1) -> "$age год"
+    (age / 10 % 10 != 1 && age % 10 in 2..4) -> "$age года"
+    else -> "$age лет"
 }
 
 /**
@@ -86,11 +86,10 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double {
-    val distance = (t1 * v1 + t2 * v2 + t3 * v3) / 2
-    if (t1 * v1 >= distance) return distance / v1
-    if (t1 * v1 + t2 * v2 >= distance) return (distance - v1 * t1) / v2 + t1
-    return (distance - v1 * t1 - v2 * t2) / v3 + t1 + t2
+) = when {
+    (t1 * v1 >= (t1 * v1 + t2 * v2 + t3 * v3) / 2) -> (t1 * v1 + t2 * v2 + t3 * v3) / 2 / v1
+    (t1 * v1 + t2 * v2 >= (t1 * v1 + t2 * v2 + t3 * v3) / 2) -> ((t1 * v1 + t2 * v2 + t3 * v3) / 2 - v1 * t1) / v2 + t1
+    else -> ((t1 * v1 + t2 * v2 + t3 * v3) / 2 - v1 * t1 - v2 * t2) / v3 + t1 + t2
 }
 
 /**
