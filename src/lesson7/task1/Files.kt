@@ -72,7 +72,7 @@ fun count(initial: String): Int {
 
 fun deleteMarked(inputName: String, outputName: String) {
     var ifile = File(inputName).readLines()
-    var ofile = File(outputName).bufferedWriter().use{ofile ->
+    var ofile = File(outputName).bufferedWriter().use { ofile ->
         for (i in ifile) {
             if (!i.isEmpty()) {
                 if (i[0] != '_') ofile.write(i + "\n")
@@ -92,17 +92,20 @@ fun deleteMarked(inputName: String, outputName: String) {
  */
 fun countWords(line: String, word: String): Int {
     var res = 0
-    for (i in minOf(line.length, word.length - 1)until line.length) {
+    for (i in minOf(line.length, word.length - 1) until line.length) {
         if (word.lowercase() == line.substring(i - (word.length - 1), i + 1).lowercase()) res++
     }
     return res
 }
+
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     var res: MutableMap<String, Int> = mutableMapOf()
     var file = File(inputName).readLines()
     for (line in file) {
         for (word in substrings.toSet()) {
-            if (!res.containsKey(word)) {res.put(word, 0)}
+            if (!res.containsKey(word)) {
+                res.put(word, 0)
+            }
             res.put(word, res.getValue(word) + countWords(line, word))
         }
     }
@@ -123,22 +126,26 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    var letters1 = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш','щ')
+    var letters1 = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
     var letters2 = listOf('Ы', 'Я', 'Ю', 'ы', 'я', 'ю')
     var toChange = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
     var ifile = File(inputName).readText()
-    var ofile = File(outputName).bufferedWriter().use {ofile ->
+    var ofile = File(outputName).bufferedWriter().use { ofile ->
         if (ifile.length == 0) ofile.write("")
         else {
             ofile.write(ifile[0].toString())
             for (i in minOf(1, ifile.length - 1) until ifile.length) {
                 if (ifile[i] in letters2 && ifile[i - 1] in letters1) {
-                    if (ifile.substring(i - 1, i + 3).lowercase() != "жури" &&
-                        ifile.substring(i - 4, i + 2).lowercase() != "брошур" &&
-                        ifile.substring(i - 5, i + 2).lowercase() != "парашут"
-                    ) {
-                        ofile.write(toChange.getValue(ifile[i]).toString())
-                    } else ofile.write(ifile[i].toString())
+                    try {
+                        if (ifile.substring(i - 1, i + 3).lowercase() != "жури" &&
+                            ifile.substring(i - 4, i + 2).lowercase() != "брошур" &&
+                            ifile.substring(i - 5, i + 2).lowercase() != "парашут"
+                        ) {
+                            ofile.write(toChange.getValue(ifile[i]).toString())
+                        } else ofile.write(ifile[i].toString())
+                    } catch (e: Exception) {
+                        ofile.write(ifile[i].toString())
+                    }
                 } else ofile.write(ifile[i].toString())
             }
         }
@@ -163,7 +170,18 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    var ifile = File(inputName).readLines()
+    var ofile = File(outputName).bufferedWriter()
+    var maxLength = 0
+    for (i in ifile) {
+        if (i.trim().length > maxLength) maxLength = i.trim().length
+    }
+    for (i in ifile) {
+        for (j in 0 until (maxLength - i.trim().length) / 2) ofile.write(" ")
+        ofile.write(i.trim())
+        ofile.newLine()
+    }
+    ofile.close()
 }
 
 /**
@@ -193,8 +211,67 @@ fun centerFile(inputName: String, outputName: String) {
  * 7) В самой длинной строке каждая пара соседних слов должна быть отделена В ТОЧНОСТИ одним пробелом
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
+fun divideSpaces(all: Int, am: Int): MutableList<Int> {
+    var res: MutableList<Int> = mutableListOf()
+    if (all % am == 0) {
+        for (i in 1..am) res.add(all / am)
+    } else {
+        var left = all % am
+        for (i in 1..am) {
+            if (left != 0) {
+                res.add(1 + all / am)
+                left--
+            } else res.add(all / am)
+        }
+    }
+    return res
+}
+
+fun someTimes(n: String, t: Int): String {
+    var new = ""
+    for (j in 1..t) new += n
+    return new
+}
+
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    var ifile = File(inputName).readLines()
+    var ofile = File(outputName).bufferedWriter()
+    var maxLength = 0
+    for (i in ifile) {
+        var length = 0
+        var times = 0
+        for (j in i.split(" ")) {
+            length += j.length
+            if (j.length > 0) times++
+        }
+        if (times > 0) times--
+        length += times
+        maxLength = maxOf(maxLength, length)
+    }
+    for (i in ifile) {
+        var now = i.trim()
+        if (now.length == 0) {
+            ofile.newLine(); continue
+        }
+
+        var lettersForWords = 0
+        var words = 0
+        for (j in now.split(" ")) {
+            lettersForWords += j.length
+            if (j.length > 0) words++
+        }
+        var spaces = maxLength - lettersForWords
+        var one = 0
+        var mas: List<Int> = listOf(0)
+        if (words > 1) mas = divideSpaces(spaces, words - 1)
+        var buffer = i.split(" ").toMutableList(); while ("" in buffer) buffer.remove("")
+        for (i in 0 until buffer.size) {
+            if (i < buffer.size - 1) ofile.write(buffer[i] + someTimes(" ", mas[i]))
+            else ofile.write(buffer[i])
+        }
+        ofile.newLine()
+    }
+    ofile.close()
 }
 
 /**
