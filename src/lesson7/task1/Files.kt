@@ -144,7 +144,7 @@ fun sibilants(inputName: String, outputName: String) {
                             ofile.write(toChange.getValue(ifile[i]).toString())
                         } else ofile.write(ifile[i].toString())
                     } catch (e: Exception) {
-                        ofile.write(ifile[i].toString())
+                        ofile.write(toChange.getValue(ifile[i]).toString())
                     }
                 } else ofile.write(ifile[i].toString())
             }
