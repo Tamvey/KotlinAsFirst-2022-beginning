@@ -69,16 +69,16 @@ fun count(initial: String): Int {
     }
     return res
 }
+
 fun deleteMarked(inputName: String, outputName: String) {
-    TODO()
-    /*var ofile = File(outputName).bufferedWriter().use { ofile ->
-        for (line in File(inputName).readLines()) {
-            if (line.length > 0 && line[0] != '_') {
-                ofile.write(line + '\n')
-            }
-            if ("\n" in line) ofile.newLine()
+    var ifile = File(inputName).readLines()
+    var ofile = File(outputName).bufferedWriter().use{ofile ->
+        for (i in ifile) {
+            if (!i.isEmpty()) {
+                if (i[0] != '_') ofile.write(i + "\n")
+            } else ofile.newLine()
         }
-    }*/
+    }
 }
 
 /**
@@ -90,18 +90,24 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
-
-    /*var res: MutableMap<String, Int> = mutableMapOf()
+fun countWords(line: String, word: String): Int {
+    var res = 0
+    for (i in minOf(line.length, word.length - 1)until line.length) {
+        if (word.lowercase() == line.substring(i - (word.length - 1), i + 1).lowercase()) res++
+    }
+    return res
+}
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    var res: MutableMap<String, Int> = mutableMapOf()
     var file = File(inputName).readLines()
     for (line in file) {
-        for (word in line.split(" ")) {
-            if (word !in res.keys) {res.put(word, 0); res[word] = res.getValue(word) + 1}
+        for (word in substrings) {
+            if (!res.containsKey(word)) {res.put(word, 0)}
+            res.put(word, res.getValue(word) + countWords(line, word))
         }
     }
-    return res*/
-
-
+    return res
+}
 
 /**
  * Средняя (12 баллов)
@@ -117,7 +123,24 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    var letters1 = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш','щ')
+    var letters2 = listOf('Ы', 'Я', 'Ю', 'ы', 'я', 'ю')
+    var toChange = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
+    var ifile = File(inputName).readText()
+    var ofile = File(outputName).bufferedWriter().use {ofile ->
+        ofile.write(ifile?.get(0).toString())
+        for (i in minOf(1, ifile.length - 1) until ifile.length) {
+            if (ifile[i] in letters2 && ifile[i - 1] in letters1) {
+                if (ifile.substring(i - 1, i + 3).lowercase() != "жури" &&
+                    ifile.substring(i - 4, i + 2).lowercase() != "брошур" &&
+                    ifile.substring(i - 5, i + 2).lowercase() != "парашут") {
+                    ofile.write(toChange.getValue(ifile[i]).toString())
+                }
+                else ofile.write(ifile[i].toString())
+            }
+            else ofile.write(ifile[i].toString())
+        }
+    }
 }
 
 /**
