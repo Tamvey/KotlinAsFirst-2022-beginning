@@ -327,14 +327,13 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun giveAmountOfLetters(word: String): Map<String, Int> {
-    val alph = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
     var res: MutableMap<String, Int> = mutableMapOf()
-    for (i in alph) {
+    for (i in word) {
         var counter = 0
         for (j in word) {
             if (j == i) counter++
         }
-        res.put(i.toString(), counter)
+        if (!res.containsKey(word)) res.put(i.toString(), counter)
     }
     return res
 }

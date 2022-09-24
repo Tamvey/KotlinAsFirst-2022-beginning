@@ -101,7 +101,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     var res: MutableMap<String, Int> = mutableMapOf()
     var file = File(inputName).readLines()
     for (line in file) {
-        for (word in substrings) {
+        for (word in substrings.toSet()) {
             if (!res.containsKey(word)) {res.put(word, 0)}
             res.put(word, res.getValue(word) + countWords(line, word))
         }
@@ -128,17 +128,19 @@ fun sibilants(inputName: String, outputName: String) {
     var toChange = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
     var ifile = File(inputName).readText()
     var ofile = File(outputName).bufferedWriter().use {ofile ->
-        ofile.write(ifile?.get(0).toString())
-        for (i in minOf(1, ifile.length - 1) until ifile.length) {
-            if (ifile[i] in letters2 && ifile[i - 1] in letters1) {
-                if (ifile.substring(i - 1, i + 3).lowercase() != "жури" &&
-                    ifile.substring(i - 4, i + 2).lowercase() != "брошур" &&
-                    ifile.substring(i - 5, i + 2).lowercase() != "парашут") {
-                    ofile.write(toChange.getValue(ifile[i]).toString())
-                }
-                else ofile.write(ifile[i].toString())
+        if (ifile.length == 0) ofile.write("")
+        else {
+            ofile.write(ifile[0].toString())
+            for (i in minOf(1, ifile.length - 1) until ifile.length) {
+                if (ifile[i] in letters2 && ifile[i - 1] in letters1) {
+                    if (ifile.substring(i - 1, i + 3).lowercase() != "жури" &&
+                        ifile.substring(i - 4, i + 2).lowercase() != "брошур" &&
+                        ifile.substring(i - 5, i + 2).lowercase() != "парашут"
+                    ) {
+                        ofile.write(toChange.getValue(ifile[i]).toString())
+                    } else ofile.write(ifile[i].toString())
+                } else ofile.write(ifile[i].toString())
             }
-            else ofile.write(ifile[i].toString())
         }
     }
 }

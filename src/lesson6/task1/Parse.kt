@@ -162,6 +162,13 @@ fun flattenPhoneNumber(phone: String): String {
     }
     if (countSymbols(res, '+') > 1 || (countSymbols(res, '+') == 1 && res[0] != '+')) return ""
     if (countSymbols(res, '(') != countSymbols(res, ')')) return ""
+    // Counting of '(' and ')'
+    var c = 0
+    for (i in phone) {
+        if (i == '(') c++
+        if (i == ')') c--
+    }
+    if (c != 0) return ""
     return res
 }
 
@@ -292,11 +299,14 @@ fun firstDuplicateIndex(str: String): Int {
  * Все цены должны быть больше нуля либо равны нулю.
  */
 fun mostExpensive(description: String): String {
-    var res = description.split(";")
+    var res: List<String>
+    if (';' in description) res = description.split(";")
+    else res = listOf(description)
     var nameOfMax = ""
-    var valueOfMax = Double.MIN_VALUE
+    var valueOfMax = -1.0
     for (i in res) {
         var now = i.split(" ").toMutableList()
+        while (" " in now) now.remove(" ")
         while ("" in now) now.remove("")
         if (now.size < 2) return nameOfMax
         try {
