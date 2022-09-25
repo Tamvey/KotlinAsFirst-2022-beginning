@@ -237,6 +237,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     var ifile = File(inputName).readLines()
     var ofile = File(outputName).bufferedWriter()
     var maxLength = 0
+    // Find the longest line with only one space between words
     for (i in ifile) {
         var length = 0
         var times = 0
@@ -248,6 +249,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
         length += times
         maxLength = maxOf(maxLength, length)
     }
+    // Processing all lines
     for (i in ifile) {
         var now = i.trim()
         if (now.length == 0) {
@@ -294,7 +296,43 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+// Delete symbols except of letters
+fun change(line: String): String {
+    var posLet = "йцукенгшщзхъэждлорпавыфячсмитьбюёqwertyuiopasdfghjklzxcvbnm"
+    var new = ""
+    for (i in line) {
+        if (i.toString() in posLet) new += i.toString()
+        else new += " "
+    }
+    return new
+}
+
+fun top20Words(inputName: String): Map<String, Int> {
+    var ifile = File(inputName).readLines()
+    var res: MutableMap<String, Int> = mutableMapOf()
+    // Counting amount of each word -> res
+    for (i in ifile) {
+        var now = change(i.lowercase()).split(" ").toMutableList()
+        while ("" in now) now.remove("")
+        for (word in now) {
+            if (!res.containsKey(word)) {
+                res.put(word, 1)
+            } else res.set(word, res.getValue(word) + 1)
+        }
+    }
+    // Sorting, reversion res and choosing 20 or more words
+    var listOfPairs = res.toList()
+    var res1: MutableMap<String, Int> = mutableMapOf()
+    listOfPairs = listOfPairs.sortedBy{ it -> it.second }.reversed()
+    for (i in listOfPairs.indices) {
+        if (i <= 19 || (i > 19 && listOfPairs[i].second == listOfPairs[i - 1].second)) res1.put(
+            listOfPairs[i].first,
+            listOfPairs[i].second
+        )
+        else break
+    }
+    return res1
+}
 
 /**
  * Средняя (14 баллов)
@@ -332,7 +370,19 @@ fun top20Words(inputName: String): Map<String, Int> = TODO()
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    var ifile = File(inputName).readLines()
+    var ofile = File(outputName).bufferedWriter().use { ofile ->
+        for (j in ifile) {
+            var st = j.lowercase()
+            for (i in dictionary) {
+                st = st.replace(i.key.toString().lowercase(), i.value.lowercase())
+            }
+            if (j[0].toString() == j[0].toString().uppercase())
+                st = st[0].toString().uppercase() + st.substring(1, st.length)
+            ofile.write(st)
+            ofile.newLine()
+        }
+    }
 }
 
 /**
@@ -360,7 +410,30 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    var bufer: MutableMap<Int, MutableList<String>> = mutableMapOf()
+    var text = File(inputName).readLines()
+    var ofile = File(outputName).bufferedWriter()
+    var maxx = -1
+    var resList: MutableList<String> = mutableListOf()
+    for (i in text) {
+        for (word in i.split(" ")) {
+            if (word == "") continue
+            // Set of letters to define amount of unique ones
+            var setOfLetters: MutableSet<String> = mutableSetOf()
+            for (j in word) if (j.toString().lowercase() !in setOfLetters) setOfLetters.add(j.toString().lowercase())
+            // Processing maxx, resList
+            if (setOfLetters.size > maxx) {
+                maxx = setOfLetters.size
+                resList = mutableListOf(word)
+            } else if (setOfLetters.size == maxx) resList += word
+        }
+    }
+    // Writing in file
+    for (i in resList.indices) {
+        if (i != resList.size - 1) ofile.write(resList[i] + ", ")
+        else ofile.write(resList[i])
+    }
+    ofile.close()
 }
 
 /**
@@ -408,8 +481,18 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+fun replaceInLine(line: String, str: String): String {
+    return ""
+}
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     TODO()
+    /*var ifile = File(inputName).readLines()
+    var ofile = File(outputName).bufferedWriter()
+    ofile.write("<html>\n")
+    ofile.write("<body>\n")
+    for
+    ofile.write("</body>\n")
+    ofile.write("</html>\n")*/
 }
 
 /**
