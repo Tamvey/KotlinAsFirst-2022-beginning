@@ -100,20 +100,12 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
-    var v: MutableList<MutableList<String>> = mutableListOf()
-    var k: MutableList<Int> = mutableListOf()
+    var res = mutableMapOf<Int, MutableList<String>>()
     for (i in grades) {
-        if (i.value !in k) {
-            k.add(i.value); v.add(mutableListOf(i.key))
-        } else {
-            v[k.indexOf(i.value)].add(i.key)
-        }
+        if (i.value !in res.keys) res.put(i.value, mutableListOf())
+        res.getValue(i.value).add(i.key)
     }
-    var res: MutableMap<Int, List<String>> = mutableMapOf()
-    for (i in 0..k.size - 1) {
-        res.put(k[i], v[i].toList())
-    }
-    return res.toMap()
+    return res
 }
 
 /**
@@ -127,10 +119,10 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    if (a.size == 0) return true
+    if (a.size == 0) return true // if a is empty then a is submap of b
     for (i in a) {
         for (j in b) {
-            if (i.value == j.value && i.key == j.key && i.key != "" && i.value != "") return true
+            if (i.value == j.value && i.key == j.key) return true
         }
     }
     return false
@@ -152,7 +144,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
     for (j in b) {
-        if (a.containsKey(j.key) && b[j.key] == a[j.key]) a.remove(j.key)
+        if (j.key in a && b?.getValue(j.key) == a?.getValue(j.key)) a.remove(j.key)
     }
 }
 
@@ -163,13 +155,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * В выходном списке не должно быть повторяющихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    var res: MutableSet<String> = mutableSetOf()
-    for (i in a) {
-        if (b.contains(i)) res.add(i)
-    }
-    return res.toList()
-}
+fun whoAreInBoth(a: List<String>, b: List<String>) = a.intersect(b).toList()
 
 /**
  * Средняя (3 балла)
@@ -262,7 +248,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
             }
         }
     }
-    if (been == true) return name
+    if (been) return name
     return null
 }
 
@@ -438,32 +424,26 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val bufer: MutableMap<Int, MutableList<Int>> = mutableMapOf()
-    var a = -1;
-    var b = -1
+    // Будем хранить в мапе в качестве ключей 0..n/2 - слагаемые
+    // в качестве значений - расположение первого слагаемого (0..n/2) и второго ( (n+1)//2 .. n-1)
+    val bufer = mutableMapOf<Int, MutableList<Int>>()
     for (i in list.indices) {
-        if (list[i] !in bufer.keys) {
-            bufer.put(list[i], mutableListOf<Int>(i))
-        } else bufer[list[i]]?.add(i)
-    }
-    for (i in 0..number / 2) {
-        if (i in bufer.keys && number - i in bufer.keys) {
-
-            var gotMas: MutableList<Int> = bufer.getValue(i)
-            if (i == number - i) {
-                if (gotMas.size >= 2) {
-                    a = gotMas[0]
-                    b = gotMas[gotMas.size - 1]
-                }
-            } else {
-                a = bufer.getValue(i)[0]
-                b = bufer.getValue(number - i)[0]
-                break
-            }
-
+        if (list[i] > number / 2) {
+            if (number - list[i] !in bufer.keys) bufer.put(number - list[i], mutableListOf(-1, -1))
+            bufer.getValue(number - list[i]).set(1, i)
+        } else {
+            if (list[i] !in bufer.keys) bufer.put(list[i], mutableListOf(-1, -1))
+            // Обработка случая когда слагаемые равны
+            if (bufer.getValue(list[i])[0] != -1) return (minOf(bufer.getValue(list[i])[0], i) to maxOf(
+                bufer.getValue(
+                    list[i]
+                )[0], i
+            ))
+            else bufer.getValue(list[i]).set(0, i)
         }
     }
-    return Pair<Int, Int>(a, b)
+    for (i in bufer.values) if (i[0] >= 0 && i[1] >= 0) return (minOf(i[0], i[1]) to maxOf(i[0], i[1]))
+    return (-1 to -1)
 }
 
 /**
@@ -488,48 +468,36 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    var all: MutableList<MutableSet<String>> = mutableListOf()
-    var vals: MutableList<Int> = mutableListOf()
-    var mas: MutableList<Int> = mutableListOf()
-    for (i in 0..capacity) {
-        all.add(mutableSetOf<String>()); mas.add(0); vals.add(0)
+    var nowEl = mutableSetOf<String>()
+    var nowMas = 0
+    var nowVal = 0
+    for (j in treasures) {
+        if (j.value.first <= capacity) {
+            nowMas = j.value.first
+            nowVal = j.value.second
+            nowEl.add(j.key)
+        }
     }
     for (i in 0..capacity) {
-        // Поиск самого выгодного единичного элемента
-        for (j in treasures.keys) {
-            var nowEl = treasures.getValue(j)
-            if (nowEl.second > vals[i] && nowEl.first <= i) {
-                vals[i] = nowEl.second
-                mas[i] = nowEl.first
-                all[i] = mutableSetOf(j)
-            }
-            if (nowEl.second == vals[i] && nowEl.first < mas[i]) {
-                vals[i] = nowEl.second
-                mas[i] = nowEl.first
-                all[i] = mutableSetOf(j)
-            }
-        }
-        // Основной алгоритм
-        for (n in i downTo 1) {
-
-            for (some in treasures.keys) {
-                var nowEl = treasures.getValue(some)
-                if (vals[n] + nowEl.second > vals[i] && mas[n] + nowEl.first <= i && some !in all[n]) {
-                    mas[i] = mas[n] + nowEl.first
-                    vals[i] = vals[n] + nowEl.second
-                    all[i] = all[n]
-                    all[i].add(some)
+        while (true) {
+            var leftEl = (treasures.keys - nowEl).toMutableSet()
+            var br = false
+            for (j in leftEl) {
+                for (k in nowEl) {
+                    if (nowVal - treasures.getValue(j).second + treasures.getValue(j).second > nowVal &&
+                        nowMas - treasures.getValue(j).first + treasures.getValue(j).first <= capacity) {
+                        nowVal = nowVal - treasures.getValue(j).second + treasures.getValue(j).second
+                        nowMas = nowMas - treasures.getValue(j).first + treasures.getValue(j).first
+                        leftEl.add(k); nowEl.remove(k)
+                        nowEl.add(j); leftEl.remove(j)
+                        br = true
+                        break
+                    }
                 }
-                if (vals[n] + nowEl.second == vals[i] && mas[n] + nowEl.first < mas[i] && some !in all[n]) {
-                    mas[i] = mas[n] + nowEl.first
-                    vals[i] = vals[n] + nowEl.second
-                    all[i] = all[n]
-                    all[i].add(some)
-                }
+                if (br) break
             }
-
+            if (br == false) break
         }
-
     }
-    return all[capacity]
+    return nowEl
 }

@@ -4,6 +4,7 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.*
+import lesson3.task1.getNumber
 
 // Урок 4: списки
 // Максимальное количество баллов = 12
@@ -120,22 +121,16 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double {
-    var res = 0.0
-    for (i in v) res += i * i
-    return sqrt(res)
-}
+fun abs(v: List<Double>) = sqrt(v.sumOf { it * it })
 
 /**
  * Простая (2 балла)
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double {
-    if (list.size == 0) return 0.0
-    var res = 0.0
-    for (i in list) res += i
-    return res / list.size
+fun mean(list: List<Double>) = when {
+    (list.isNotEmpty()) -> list.sumOf { it } / list.size
+    else -> 0.0
 }
 
 /**
@@ -160,7 +155,7 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
 fun times(a: List<Int>, b: List<Int>): Int {
-    if (a.size == 0 || b.size == 0) return 0
+    if (a.size * b.size == 0) return 0
     var res = 0
     for (i in 0..a.size - 1) res += a[i] * b[i]
     return res
@@ -174,7 +169,7 @@ fun times(a: List<Int>, b: List<Int>): Int {
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0 при любом x.
  */
-fun mypow(number: Int, times: Int): Int {
+fun raiseToSomeDegree(number: Int, times: Int): Int {
     var res = 1
     for (i in 0..times - 1) {
         res *= number
@@ -185,7 +180,7 @@ fun mypow(number: Int, times: Int): Int {
 fun polynom(p: List<Int>, x: Int): Int {
     var res = 0
     for (i in p.indices) {
-        res += mypow(x, i) * p[i]
+        res += raiseToSomeDegree(x, i) * p[i]
     }
     return res
 }
@@ -217,7 +212,7 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    var mas: List<Int> = arrayListOf()
+    var mas = arrayListOf<Int>()
     var n1 = n
     for (i in 2..n - 1) {
         if (n1 % i == 0) {
@@ -230,7 +225,7 @@ fun factorize(n: Int): List<Int> {
     if (mas.size == 0) {
         mas += n
     }
-    return mas.sorted()
+    return mas
 }
 
 /**
@@ -241,12 +236,13 @@ fun factorize(n: Int): List<Int> {
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
 fun factorizeToString(n: Int): String {
-    var mas = factorize(n)
-    var st = ""
-    for (i in 0..mas.size - 2) {
-        st += "${mas[i]}*"
+    val mas = factorize(n)
+    var st = buildString {
+        for (i in 0 until mas.size) {
+            append("${mas[i]}")
+            if (i != mas.size - 1) append('*')
+        }
     }
-    st += "${mas[mas.size - 1]}"
     return st
 }
 
@@ -299,9 +295,9 @@ fun convertToString(n: Int, base: Int): String {
  */
 fun decimal(digits: List<Int>, base: Int): Int {
     var res = 0
-    var dig = digits.reversed()
+    val dig = digits.reversed()
     for (i in dig.indices) {
-        res += mypow(base, i) * dig[i]
+        res += raiseToSomeDegree(base, i) * dig[i]
     }
     return res
 }
@@ -324,9 +320,9 @@ fun decimalFromString(str: String, base: Int): Int {
     var alph = "abcdefghijklmnopqrstuvwxyz"
     for (i in 0..st.length - 1) {
         if (st[i] in alph) {
-            res += (alph.indexOf(st[i]) + 10) * mypow(base, i)
+            res += (alph.indexOf(st[i]) + 10) * raiseToSomeDegree(base, i)
         } else {
-            res += st[i].digitToInt() * mypow(base, i)
+            res += st[i].digitToInt() * raiseToSomeDegree(base, i)
         }
     }
     return res
@@ -340,7 +336,7 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun getNumber(number: Int, place: Int) = number / lesson3.task1.mypow(10, place) % 10
+
 fun getSomeSymbols(n: Char, times: Int): String {
     var res = ""
     for (i in 1..times) res += n
@@ -359,8 +355,9 @@ fun roman(n: Int): String {
     for (i in n1) {
         var number = i.digitToInt()
         if (number == 0) {
-            now++; continue
-        } else if (now >= 3) res = "${getSomeSymbols(one[3], mypow(10, now - 3) * number) + res}"
+            now++
+            continue
+        } else if (now >= 3) res = "${getSomeSymbols(one[3], raiseToSomeDegree(10, now - 3) * number) + res}"
         else if (number == 1) res = "${one[now] + res}"
         else res = "${raz[now][number - 1] + res}"
         now++
@@ -375,14 +372,7 @@ fun roman(n: Int): String {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-// функцию скопипастил из третьего лессона
-fun getLength(number: Int): Int {
-    var length = 0
-    while (number / mypow(10, length) != 0 && length < 10) {
-        length++
-    }
-    return length
-}
+
 
 fun firstThree(n: Int): String {
     var res = ""
