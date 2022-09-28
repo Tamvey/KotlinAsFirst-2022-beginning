@@ -427,6 +427,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     // Будем хранить в мапе в качестве ключей 0..n/2 - слагаемые
     // в качестве значений - расположение первого слагаемого (0..n/2) и второго ( (n+1)//2 .. n-1)
     val bufer = mutableMapOf<Int, MutableList<Int>>()
+    if (number in list && 0 in list) return (minOf(list.indexOf(0), list.indexOf(number)) to maxOf(list.indexOf(0), list.indexOf(number)))
     for (i in list.indices) {
         if (list[i] > number / 2) {
             if (number - list[i] !in bufer.keys) bufer.put(number - list[i], mutableListOf(-1, -1))
@@ -471,21 +472,28 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     var nowEl = mutableSetOf<String>()
     var nowMas = 0
     var nowVal = 0
+    // Подбор хотя бы одного элемента
     for (j in treasures) {
         if (j.value.first <= capacity) {
             nowMas = j.value.first
             nowVal = j.value.second
             nowEl.add(j.key)
+            break
         }
     }
+    if (nowEl.isEmpty()) return emptySet()
     for (i in 0..capacity) {
+        // Замена одного элемента на другой, при этом самая выгодная
         while (true) {
             var leftEl = (treasures.keys - nowEl).toMutableSet()
             var br = false
             for (j in leftEl) {
                 for (k in nowEl) {
-                    if (nowVal - treasures.getValue(j).second + treasures.getValue(j).second > nowVal &&
-                        nowMas - treasures.getValue(j).first + treasures.getValue(j).first <= capacity) {
+                    if ((nowVal - treasures.getValue(j).second + treasures.getValue(j).second > nowVal &&
+                                nowMas - treasures.getValue(j).first + treasures.getValue(j).first <= capacity) ||
+                        (nowVal - treasures.getValue(j).second + treasures.getValue(j).second == nowVal &&
+                                nowMas - treasures.getValue(j).first + treasures.getValue(j).first < nowMas)
+                    ) {
                         nowVal = nowVal - treasures.getValue(j).second + treasures.getValue(j).second
                         nowMas = nowMas - treasures.getValue(j).first + treasures.getValue(j).first
                         leftEl.add(k); nowEl.remove(k)
@@ -496,8 +504,33 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 }
                 if (br) break
             }
-            if (br == false) break
+            if (!br) break
         }
+        var bestToAdd = ""
+        var leftEl = (treasures.keys - nowEl).toMutableSet()
+        for (j in leftEl) {
+            if (treasures.getValue(j).first + nowMas <= capacity) {
+                bestToAdd = j
+                leftEl.remove(j)
+                break
+            }
+        }
+        if (bestToAdd == "") continue
+        for (j in leftEl) {
+            if ((nowVal + treasures.getValue(j).second - treasures.getValue(bestToAdd).second > nowVal &&
+                        nowMas + treasures.getValue(j).first - treasures.getValue(bestToAdd).first <= capacity) ||
+                (nowVal + treasures.getValue(j).second - treasures.getValue(bestToAdd).second == nowVal &&
+                        nowMas + treasures.getValue(j).first - treasures.getValue(bestToAdd).first < nowMas)
+            ) {
+                nowVal = nowVal + treasures.getValue(j).second - treasures.getValue(bestToAdd).second
+                nowMas = nowMas + treasures.getValue(j).first - treasures.getValue(bestToAdd).first
+                nowEl.remove(bestToAdd)
+                leftEl += (bestToAdd)
+                nowEl += j
+                bestToAdd = j
+            }
+        }
+
     }
     return nowEl
 }
