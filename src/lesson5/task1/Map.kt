@@ -509,6 +509,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 bestToAdd = j
                 leftEl.remove(j)
                 nowEl += j
+                nowMas += treasures.getValue(j).first
+                nowVal += treasures.getValue(j).second
                 break
             }
         }
@@ -523,6 +525,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 nowMas = nowMas + treasures.getValue(j).first - treasures.getValue(bestToAdd).first
                 nowEl.remove(bestToAdd)
                 leftEl += (bestToAdd)
+                leftEl.remove(j)
                 nowEl += j
                 bestToAdd = j
             }
