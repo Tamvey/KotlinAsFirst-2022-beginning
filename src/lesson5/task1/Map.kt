@@ -427,7 +427,6 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     // Будем хранить в мапе в качестве ключей 0..n/2 - слагаемые
     // в качестве значений - расположение первого слагаемого (0..n/2) и второго ( (n+1)//2 .. n-1)
     val bufer = mutableMapOf<Int, MutableList<Int>>()
-    if (number in list && 0 in list) return (minOf(list.indexOf(0), list.indexOf(number)) to maxOf(list.indexOf(0), list.indexOf(number)))
     for (i in list.indices) {
         if (list[i] > number / 2) {
             if (number - list[i] !in bufer.keys) bufer.put(number - list[i], mutableListOf(-1, -1))
@@ -435,11 +434,8 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         } else {
             if (list[i] !in bufer.keys) bufer.put(list[i], mutableListOf(-1, -1))
             // Обработка случая когда слагаемые равны
-            if (bufer.getValue(list[i])[0] != -1) return (minOf(bufer.getValue(list[i])[0], i) to maxOf(
-                bufer.getValue(
-                    list[i]
-                )[0], i
-            ))
+            if (bufer.getValue(list[i])[0] != -1 && list[i] + list[bufer.getValue(list[i])[0]] == number)
+                return (minOf(bufer.getValue(list[i])[0], i) to maxOf(bufer.getValue(list[i])[0], i))
             else bufer.getValue(list[i]).set(0, i)
         }
     }
@@ -489,13 +485,13 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             var br = false
             for (j in leftEl) {
                 for (k in nowEl) {
-                    if ((nowVal - treasures.getValue(j).second + treasures.getValue(j).second > nowVal &&
-                                nowMas - treasures.getValue(j).first + treasures.getValue(j).first <= capacity) ||
-                        (nowVal - treasures.getValue(j).second + treasures.getValue(j).second == nowVal &&
-                                nowMas - treasures.getValue(j).first + treasures.getValue(j).first < nowMas)
+                    if ((nowVal - treasures.getValue(k).second + treasures.getValue(j).second > nowVal &&
+                                nowMas - treasures.getValue(k).first + treasures.getValue(j).first <= capacity) ||
+                        (nowVal - treasures.getValue(k).second + treasures.getValue(j).second == nowVal &&
+                                nowMas - treasures.getValue(k).first + treasures.getValue(j).first < nowMas)
                     ) {
-                        nowVal = nowVal - treasures.getValue(j).second + treasures.getValue(j).second
-                        nowMas = nowMas - treasures.getValue(j).first + treasures.getValue(j).first
+                        nowVal = nowVal - treasures.getValue(k).second + treasures.getValue(j).second
+                        nowMas = nowMas - treasures.getValue(k).first + treasures.getValue(j).first
                         leftEl.add(k); nowEl.remove(k)
                         nowEl.add(j); leftEl.remove(j)
                         br = true
@@ -512,6 +508,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             if (treasures.getValue(j).first + nowMas <= capacity) {
                 bestToAdd = j
                 leftEl.remove(j)
+                nowEl += j
                 break
             }
         }
