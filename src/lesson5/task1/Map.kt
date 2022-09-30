@@ -257,7 +257,7 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     var mas = mutableSetOf<Char>()
     for (i in word) mas.add(i)
     mas = mas.map { it.lowercaseChar() }.toMutableSet()
-    if (mas == chars.toSet()) return true
+    if (mas == chars.toSet() || mas.isEmpty()) return true
     return false
 }
 
