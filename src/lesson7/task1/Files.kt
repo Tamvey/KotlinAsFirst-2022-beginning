@@ -71,7 +71,7 @@ fun count(initial: String): Int {
 }
 
 fun deleteMarked(inputName: String, outputName: String) {
-    var ifile = File(inputName).readLines()
+    val ifile = File(inputName).readLines()
     var ofile = File(outputName).bufferedWriter().use { ofile ->
         for (i in ifile) {
             if (!i.isEmpty()) {
@@ -99,8 +99,8 @@ fun countWords(line: String, word: String): Int {
 }
 
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    var res: MutableMap<String, Int> = mutableMapOf()
-    var file = File(inputName).readLines()
+    val res: MutableMap<String, Int> = mutableMapOf()
+    val file = File(inputName).readLines()
     for (line in file) {
         for (word in substrings.toSet()) {
             if (!res.containsKey(word)) {
@@ -126,10 +126,10 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    var letters1 = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
-    var letters2 = listOf('Ы', 'Я', 'Ю', 'ы', 'я', 'ю')
-    var toChange = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
-    var ifile = File(inputName).readText()
+    val letters1 = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
+    val letters2 = listOf('Ы', 'Я', 'Ю', 'ы', 'я', 'ю')
+    val toChange = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
+    val ifile = File(inputName).readText()
     var ofile = File(outputName).bufferedWriter().use { ofile ->
         if (ifile.length == 0) ofile.write("")
         else {
@@ -170,8 +170,8 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    var ifile = File(inputName).readLines()
-    var ofile = File(outputName).bufferedWriter()
+    val ifile = File(inputName).readLines()
+    val ofile = File(outputName).bufferedWriter()
     var maxLength = 0
     for (i in ifile) {
         if (i.trim().length > maxLength) maxLength = i.trim().length
@@ -212,7 +212,7 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun divideSpaces(all: Int, am: Int): MutableList<Int> {
-    var res: MutableList<Int> = mutableListOf()
+    val res: MutableList<Int> = mutableListOf()
     if (all % am == 0) {
         for (i in 1..am) res.add(all / am)
     } else {
@@ -234,8 +234,8 @@ fun someTimes(n: String, t: Int): String {
 }
 
 fun alignFileByWidth(inputName: String, outputName: String) {
-    var ifile = File(inputName).readLines()
-    var ofile = File(outputName).bufferedWriter()
+    val ifile = File(inputName).readLines()
+    val ofile = File(outputName).bufferedWriter()
     var maxLength = 0
     // Find the longest line with only one space between words
     for (i in ifile) {
@@ -251,7 +251,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     }
     // Processing all lines
     for (i in ifile) {
-        var now = i.trim()
+        val now = i.trim()
         if (now.length == 0) {
             ofile.newLine(); continue
         }
@@ -262,11 +262,11 @@ fun alignFileByWidth(inputName: String, outputName: String) {
             lettersForWords += j.length
             if (j.length > 0) words++
         }
-        var spaces = maxLength - lettersForWords
+        val spaces = maxLength - lettersForWords
         var one = 0
         var mas: List<Int> = listOf(0)
         if (words > 1) mas = divideSpaces(spaces, words - 1)
-        var buffer = i.split(" ").toMutableList(); while ("" in buffer) buffer.remove("")
+        val buffer = i.split(" ").toMutableList(); while ("" in buffer) buffer.remove("")
         for (i in 0 until buffer.size) {
             if (i < buffer.size - 1) ofile.write(buffer[i] + someTimes(" ", mas[i]))
             else ofile.write(buffer[i])
@@ -298,7 +298,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  */
 // Delete symbols except of letters
 fun change(line: String): String {
-    var posLet = "йцукенгшщзхъэждлорпавыфячсмитьбюёqwertyuiopasdfghjklzxcvbnm"
+    val posLet = "йцукенгшщзхъэждлорпавыфячсмитьбюёqwertyuiopasdfghjklzxcvbnm"
     var new = ""
     for (i in line) {
         if (i.toString() in posLet) new += i.toString()
@@ -308,11 +308,11 @@ fun change(line: String): String {
 }
 
 fun top20Words(inputName: String): Map<String, Int> {
-    var ifile = File(inputName).readLines()
-    var res: MutableMap<String, Int> = mutableMapOf()
+    val ifile = File(inputName).readLines()
+    val res: MutableMap<String, Int> = mutableMapOf()
     // Counting amount of each word -> res
     for (i in ifile) {
-        var now = change(i.lowercase()).split(" ").toMutableList()
+        val now = change(i.lowercase()).split(" ").toMutableList()
         while ("" in now) now.remove("")
         for (word in now) {
             if (!res.containsKey(word)) {
@@ -322,8 +322,8 @@ fun top20Words(inputName: String): Map<String, Int> {
     }
     // Sorting, reversion res and choosing 20 or more words
     var listOfPairs = res.toList()
-    var res1: MutableMap<String, Int> = mutableMapOf()
-    listOfPairs = listOfPairs.sortedBy{ it -> it.second }.reversed()
+    val res1: MutableMap<String, Int> = mutableMapOf()
+    listOfPairs = listOfPairs.sortedBy { it -> it.second }.reversed()
     for (i in listOfPairs.indices) {
         if (i <= 19 || (i > 19 && listOfPairs[i].second == listOfPairs[i - 1].second)) res1.put(
             listOfPairs[i].first,
@@ -370,6 +370,8 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
+    TODO()
+} /*{
     var ifile = File(inputName).readLines()
     var ofile = File(outputName).bufferedWriter().use { ofile ->
         for (j in ifile) {
@@ -383,7 +385,7 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
             ofile.newLine()
         }
     }
-}
+}*/
 
 /**
  * Средняя (12 баллов)
@@ -410,16 +412,18 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
+    TODO()
+} /*{
     var bufer: MutableMap<Int, MutableList<String>> = mutableMapOf()
-    var text = File(inputName).readLines()
-    var ofile = File(outputName).bufferedWriter()
+    val text = File(inputName).readLines()
+    val ofile = File(outputName).bufferedWriter()
     var maxx = -1
     var resList: MutableList<String> = mutableListOf()
     for (i in text) {
         for (word in i.split(" ")) {
             if (word == "") continue
             // Set of letters to define amount of unique ones
-            var setOfLetters: MutableSet<String> = mutableSetOf()
+            val setOfLetters: MutableSet<String> = mutableSetOf()
             for (j in word) if (j.toString().lowercase() !in setOfLetters) setOfLetters.add(j.toString().lowercase())
             // Processing maxx, resList
             if (setOfLetters.size > maxx) {
@@ -434,7 +438,7 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
         else ofile.write(resList[i])
     }
     ofile.close()
-}
+}*/
 
 /**
  * Сложная (22 балла)
@@ -484,6 +488,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
 fun replaceInLine(line: String, str: String): String {
     return ""
 }
+
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     TODO()
     /*var ifile = File(inputName).readLines()

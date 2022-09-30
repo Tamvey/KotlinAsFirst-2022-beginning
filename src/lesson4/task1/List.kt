@@ -178,7 +178,7 @@ fun raiseToSomeDegree(number: Int, times: Int): Int {
 }
 
 
-fun polynom(p: List<Int>, x: Int) = p.map { raiseToSomeDegree(x, p.indexOf(it)) * p[p.indexOf(it)] }.sumOf { it }
+fun polynom(p: List<Int>, x: Int) = p.mapIndexed { index, vall -> raiseToSomeDegree(x, index) * vall }.sumOf { it }
 
 /**
  * Средняя (3 балла)
@@ -246,7 +246,7 @@ fun factorizeToString(n: Int): String {
  */
 fun convert(n: Int, base: Int): List<Int> {
     if (n == 0) return mutableListOf(0)
-    var res = mutableListOf<Int>()
+    val res = mutableListOf<Int>()
     var n1 = n
     while (n1 != 0) {
         res += n1 % base
@@ -267,9 +267,9 @@ fun convert(n: Int, base: Int): List<Int> {
  * (например, n.toString(base) и подобные), запрещается.
  */
 fun convertToString(n: Int, base: Int): String {
-    var alph = "abcdefghijklmnopqrstuvwxyz"
-    var converted = convert(n, base)
-    var res = buildString {
+    val alph = "abcdefghijklmnopqrstuvwxyz"
+    val converted = convert(n, base)
+    val res = buildString {
         for (i in converted) {
             if (i > 9) append("${alph[i % base + 10 * (i / base - 1)]}")
             else append("$i")
@@ -330,16 +330,16 @@ fun decimalFromString(str: String, base: Int): Int {
  */
 
 fun roman(n: Int): String {
-    var one = "IXCM"
-    var n1 = n.toString().reversed()
+    val one = "IXCM"
+    val n1 = n.toString().reversed()
     var res = ""
     var now = 0
-    var ed = arrayListOf<String>("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
-    var des = arrayListOf<String>("X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
-    var sot = arrayListOf<String>("C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
-    var raz = arrayListOf<List<String>>(ed, des, sot)
+    val ed = arrayListOf<String>("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+    val des = arrayListOf<String>("X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
+    val sot = arrayListOf<String>("C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
+    val raz = arrayListOf<List<String>>(ed, des, sot)
     for (i in n1) {
-        var number = i.digitToInt()
+        val number = i.digitToInt()
         if (number == 0) {
             now++
             continue
@@ -362,14 +362,14 @@ fun roman(n: Int): String {
 
 fun firstThree(n: Int): String {
     var res = ""
-    var ed = listOf("ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
-    var special = listOf(
+    val ed = listOf("ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+    val special = listOf(
         "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать",
         "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
     )
-    var des =
+    val des =
         listOf("двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто")
-    var sot = listOf("сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
+    val sot = listOf("сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
     if (n % 100 in 10..19) {
         if (n / 100 != 0) res = "${sot[n / 100 - 1]} "
         res += special[n % 10]
@@ -383,14 +383,14 @@ fun firstThree(n: Int): String {
 
 fun secondThree(n: Int): String {
     var res = ""
-    var ed = listOf("одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
-    var special = listOf(
+    val ed = listOf("одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+    val special = listOf(
         "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать",
         "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
     )
-    var des =
+    val des =
         listOf("двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто")
-    var sot = listOf("сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
+    val sot = listOf("сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
     if (n % 100 in 10..19) {
         if (n / 100 != 0) res = "${sot[n / 100 - 1]} "
         res += special[n % 10]

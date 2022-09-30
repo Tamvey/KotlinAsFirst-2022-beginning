@@ -100,7 +100,7 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
-    var res = mutableMapOf<Int, MutableList<String>>()
+    val res = mutableMapOf<Int, MutableList<String>>()
     for (i in grades) {
         if (i.value !in res.keys) res.put(i.value, mutableListOf())
         res.getValue(i.value).add(i.key)
@@ -257,7 +257,6 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     var mas = mutableSetOf<Char>()
     for (i in word) mas.add(i)
     mas = mas.map { it.lowercaseChar() }.toMutableSet()
-    if (chars.isEmpty() || mas.isEmpty()) return false
     if (mas == chars.toSet()) return true
     return false
 }
@@ -282,8 +281,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
         }
         res.put(i, res.getValue(i) + 1)
     }
-    var toDelete = mutableListOf<String>()
-    for (j in res.keys) if (res.getValue(j) == 1) toDelete += j
+    val toDelete = mutableListOf<String>()
+    for (j in res) if (j.value == 1) toDelete += j.key
     for (j in toDelete) res.remove(j)
     return res
 }
@@ -301,7 +300,7 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun giveAmountOfLetters(word: String): Map<String, Int> {
-    var res: MutableMap<String, Int> = mutableMapOf()
+    val res: MutableMap<String, Int> = mutableMapOf()
     for (i in word) {
         var counter = 0
         for (j in word) {
@@ -364,7 +363,7 @@ fun getAllFriends(name: String, friends: Map<String, Set<String>>): Set<String> 
     var now: MutableSet<String> = mutableSetOf()
     if (friends.containsKey(name)) now = friends.getValue(name).toMutableSet()
     while (true) {
-        var new: MutableSet<String> = mutableSetOf()
+        val new: MutableSet<String> = mutableSetOf()
         for (j in now) {
             if (j !in res) {
                 if (j != name) res.add(j)
@@ -380,7 +379,7 @@ fun getAllFriends(name: String, friends: Map<String, Set<String>>): Set<String> 
 }
 
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    var res: MutableMap<String, Set<String>> = mutableMapOf()
+    val res: MutableMap<String, Set<String>> = mutableMapOf()
     // Определение всех людей
     for (i in friends) {
         if (i.key !in res) res.put(i.key, mutableSetOf())
@@ -453,17 +452,18 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    var all: MutableList<MutableSet<String>> = mutableListOf()
-    var vals: MutableList<Int> = mutableListOf()
-    var mas: MutableList<Int> = mutableListOf()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+/*{
+    val all: MutableList<MutableSet<String>> = mutableListOf()
+    val vals: MutableList<Int> = mutableListOf()
+    val mas: MutableList<Int> = mutableListOf()
     for (i in 0..capacity) {
         all.add(mutableSetOf<String>()); mas.add(0); vals.add(0)
     }
     for (i in 0..capacity) {
         // Поиск самого выгодного единичного элемента
         for (j in treasures.keys) {
-            var nowEl = treasures.getValue(j)
+            val nowEl = treasures.getValue(j)
             if (nowEl.second > vals[i] && nowEl.first <= i) {
                 vals[i] = nowEl.second
                 mas[i] = nowEl.first
@@ -479,7 +479,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         for (n in i downTo 1) {
 
             for (some in treasures.keys) {
-                var nowEl = treasures.getValue(some)
+                val nowEl = treasures.getValue(some)
                 if (vals[n] + nowEl.second > vals[i] && mas[n] + nowEl.first <= i && some !in all[n]) {
                     mas[i] = mas[n] + nowEl.first
                     vals[i] = vals[n] + nowEl.second
@@ -498,4 +498,4 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
 
     }
     return all[capacity]
-}
+}*/
