@@ -119,11 +119,9 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    if (a.size == 0) return true // if a is empty then a is submap of b
+    if (a.isEmpty()) return true // if a is empty then a is submap of b
     for (i in a) {
-        for (j in b) {
-            if (i.value == j.value && i.key == j.key) return true
-        }
+        if (b.containsKey(i.key) && b[i.key] == i.value) return true
     }
     return false
 }
@@ -144,7 +142,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
     for (j in b) {
-        if (j.key in a && b?.getValue(j.key) == a?.getValue(j.key)) a.remove(j.key)
+        if (j.key in a && b[j.key] == a[j.key]) a.remove(j.key)
     }
 }
 
@@ -176,18 +174,12 @@ fun whoAreInBoth(a: List<String>, b: List<String>) = a.intersect(b).toList()
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val res: MutableMap<String, String> = mutableMapOf()
-    if (mapA.size == 0) return mapB
-    if (mapB.size == 0) return mapA
-    for (a in mapA) {
-        for (b in mapB) {
-            if (a.key == b.key) {
-                if (a.value != b.value) {
-                    res.put(a.key, "${a.value}, ${b.value}")
-                } else res.put(a.key, a.value)
-            } else {
-                if (a.key !in res) res.put(a.key, a.value)
-                if (b.key !in res) res.put(b.key, b.value)
-            }
+    for (i in mapA) res.put(i.key, i.value)
+    for (i in mapB) {
+        if (i.key !in res) {
+            res.put(i.key, i.value)
+        } else {
+            if (i.value != res[i.key]) res.put(i.key, res.getValue(i.key) + ", " + i.value)
         }
     }
     return res
@@ -262,16 +254,12 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    for (i in word) {
-        var been = 0
-        for (j in chars) {
-            if (i.lowercase() == j.lowercase()) {
-                been = 1; break
-            }
-        }
-        if (been == 0) return false
-    }
-    return true
+    var mas = mutableSetOf<Char>()
+    for (i in word) mas.add(i)
+    mas = mas.map { it.lowercaseChar() }.toMutableSet()
+    if (chars.isEmpty() || mas.isEmpty()) return false
+    if (mas == chars.toSet()) return true
+    return false
 }
 
 /**
@@ -290,13 +278,13 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
     val res: MutableMap<String, Int> = mutableMapOf()
     for (i in list) {
         if (i !in res.keys) {
-            var counter = 0
-            for (j in list) {
-                if (j == i) counter++
-            }
-            if (counter > 1) res.put(i, counter)
+            res.put(i, 0)
         }
+        res.put(i, res.getValue(i) + 1)
     }
+    var toDelete = mutableListOf<String>()
+    for (j in res.keys) if (res.getValue(j) == 1) toDelete += j
+    for (j in toDelete) res.remove(j)
     return res
 }
 
@@ -326,9 +314,10 @@ fun giveAmountOfLetters(word: String): Map<String, Int> {
 
 fun hasAnagrams(words: List<String>): Boolean {
     for (i in 0..words.size - 2) {
+        val nowWord = giveAmountOfLetters(words[i])
         for (j in i + 1..words.size - 1) {
             if (words[j].length == words[i].length &&
-                giveAmountOfLetters(words[j]) == giveAmountOfLetters(words[i])
+                nowWord == giveAmountOfLetters(words[j])
             )
                 return true
         }
@@ -465,73 +454,48 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    var nowEl = mutableSetOf<String>()
-    var nowMas = 0
-    var nowVal = 0
-    // Подбор хотя бы одного элемента
-    for (j in treasures) {
-        if (j.value.first <= capacity) {
-            nowMas = j.value.first
-            nowVal = j.value.second
-            nowEl.add(j.key)
-            break
-        }
-    }
-    if (nowEl.isEmpty()) return emptySet()
+    var all: MutableList<MutableSet<String>> = mutableListOf()
+    var vals: MutableList<Int> = mutableListOf()
+    var mas: MutableList<Int> = mutableListOf()
     for (i in 0..capacity) {
-        // Замена одного элемента на другой, при этом самая выгодная
-        while (true) {
-            var leftEl = (treasures.keys - nowEl).toMutableSet()
-            var br = false
-            for (j in leftEl) {
-                for (k in nowEl) {
-                    if ((nowVal - treasures.getValue(k).second + treasures.getValue(j).second > nowVal &&
-                                nowMas - treasures.getValue(k).first + treasures.getValue(j).first <= capacity) ||
-                        (nowVal - treasures.getValue(k).second + treasures.getValue(j).second == nowVal &&
-                                nowMas - treasures.getValue(k).first + treasures.getValue(j).first < nowMas)
-                    ) {
-                        nowVal = nowVal - treasures.getValue(k).second + treasures.getValue(j).second
-                        nowMas = nowMas - treasures.getValue(k).first + treasures.getValue(j).first
-                        leftEl.add(k); nowEl.remove(k)
-                        nowEl.add(j); leftEl.remove(j)
-                        br = true
-                        break
-                    }
+        all.add(mutableSetOf<String>()); mas.add(0); vals.add(0)
+    }
+    for (i in 0..capacity) {
+        // Поиск самого выгодного единичного элемента
+        for (j in treasures.keys) {
+            var nowEl = treasures.getValue(j)
+            if (nowEl.second > vals[i] && nowEl.first <= i) {
+                vals[i] = nowEl.second
+                mas[i] = nowEl.first
+                all[i] = mutableSetOf(j)
+            }
+            if (nowEl.second == vals[i] && nowEl.first < mas[i]) {
+                vals[i] = nowEl.second
+                mas[i] = nowEl.first
+                all[i] = mutableSetOf(j)
+            }
+        }
+        // Основной алгоритм
+        for (n in i downTo 1) {
+
+            for (some in treasures.keys) {
+                var nowEl = treasures.getValue(some)
+                if (vals[n] + nowEl.second > vals[i] && mas[n] + nowEl.first <= i && some !in all[n]) {
+                    mas[i] = mas[n] + nowEl.first
+                    vals[i] = vals[n] + nowEl.second
+                    all[i] = all[n]
+                    all[i].add(some)
                 }
-                if (br) break
+                if (vals[n] + nowEl.second == vals[i] && mas[n] + nowEl.first < mas[i] && some !in all[n]) {
+                    mas[i] = mas[n] + nowEl.first
+                    vals[i] = vals[n] + nowEl.second
+                    all[i] = all[n]
+                    all[i].add(some)
+                }
             }
-            if (!br) break
-        }
-        var bestToAdd = ""
-        var leftEl = (treasures.keys - nowEl).toMutableSet()
-        for (j in leftEl) {
-            if (treasures.getValue(j).first + nowMas <= capacity) {
-                bestToAdd = j
-                leftEl.remove(j)
-                nowEl += j
-                nowMas += treasures.getValue(j).first
-                nowVal += treasures.getValue(j).second
-                break
-            }
-        }
-        if (bestToAdd == "") continue
-        for (j in leftEl) {
-            if ((nowVal + treasures.getValue(j).second - treasures.getValue(bestToAdd).second > nowVal &&
-                        nowMas + treasures.getValue(j).first - treasures.getValue(bestToAdd).first <= capacity) ||
-                (nowVal + treasures.getValue(j).second - treasures.getValue(bestToAdd).second == nowVal &&
-                        nowMas + treasures.getValue(j).first - treasures.getValue(bestToAdd).first < nowMas)
-            ) {
-                nowVal = nowVal + treasures.getValue(j).second - treasures.getValue(bestToAdd).second
-                nowMas = nowMas + treasures.getValue(j).first - treasures.getValue(bestToAdd).first
-                nowEl.remove(bestToAdd)
-                leftEl += (bestToAdd)
-                leftEl.remove(j)
-                nowEl += j
-                bestToAdd = j
-                break
-            }
+
         }
 
     }
-    return nowEl
+    return all[capacity]
 }

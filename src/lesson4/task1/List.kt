@@ -177,13 +177,8 @@ fun raiseToSomeDegree(number: Int, times: Int): Int {
     return res
 }
 
-fun polynom(p: List<Int>, x: Int): Int {
-    var res = 0
-    for (i in p.indices) {
-        res += raiseToSomeDegree(x, i) * p[i]
-    }
-    return res
-}
+
+fun polynom(p: List<Int>, x: Int) = p.map { raiseToSomeDegree(x, p.indexOf(it)) * p[p.indexOf(it)] }.sumOf { it }
 
 /**
  * Средняя (3 балла)
@@ -212,19 +207,15 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    var mas = arrayListOf<Int>()
+    val mas = mutableListOf<Int>()
     var n1 = n
     for (i in 2..n - 1) {
-        if (n1 % i == 0) {
-            while (n1 % i == 0) {
-                mas += i
-                n1 /= i
-            }
+        while (n1 % i == 0) {
+            mas += i
+            n1 /= i
         }
     }
-    if (mas.size == 0) {
-        mas += n
-    }
+    if (mas.isEmpty()) mas += n
     return mas
 }
 
@@ -237,7 +228,7 @@ fun factorize(n: Int): List<Int> {
  */
 fun factorizeToString(n: Int): String {
     val mas = factorize(n)
-    var st = buildString {
+    val st = buildString {
         for (i in 0 until mas.size) {
             append("${mas[i]}")
             if (i != mas.size - 1) append('*')
@@ -254,8 +245,8 @@ fun factorizeToString(n: Int): String {
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    if (n == 0) return arrayListOf(0)
-    var res: List<Int> = arrayListOf()
+    if (n == 0) return mutableListOf(0)
+    var res = mutableListOf<Int>()
     var n1 = n
     while (n1 != 0) {
         res += n1 % base
@@ -278,10 +269,11 @@ fun convert(n: Int, base: Int): List<Int> {
 fun convertToString(n: Int, base: Int): String {
     var alph = "abcdefghijklmnopqrstuvwxyz"
     var converted = convert(n, base)
-    var res = ""
-    for (i in converted) {
-        if (i > 9) res += "${alph[i % base + 10 * (i / base - 1)]}"
-        else res += "$i"
+    var res = buildString {
+        for (i in converted) {
+            if (i > 9) append("${alph[i % base + 10 * (i / base - 1)]}")
+            else append("$i")
+        }
     }
     return res
 }
@@ -316,8 +308,8 @@ fun decimal(digits: List<Int>, base: Int): Int {
  */
 fun decimalFromString(str: String, base: Int): Int {
     var res = 0
-    var st = str.reversed()
-    var alph = "abcdefghijklmnopqrstuvwxyz"
+    val st = str.reversed()
+    val alph = "abcdefghijklmnopqrstuvwxyz"
     for (i in 0..st.length - 1) {
         if (st[i] in alph) {
             res += (alph.indexOf(st[i]) + 10) * raiseToSomeDegree(base, i)
@@ -337,12 +329,6 @@ fun decimalFromString(str: String, base: Int): Int {
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 
-fun getSomeSymbols(n: Char, times: Int): String {
-    var res = ""
-    for (i in 1..times) res += n
-    return res
-}
-
 fun roman(n: Int): String {
     var one = "IXCM"
     var n1 = n.toString().reversed()
@@ -357,8 +343,8 @@ fun roman(n: Int): String {
         if (number == 0) {
             now++
             continue
-        } else if (now >= 3) res = "${getSomeSymbols(one[3], raiseToSomeDegree(10, now - 3) * number) + res}"
-        else if (number == 1) res = "${one[now] + res}"
+        } else if (now >= 3) res = "${one[3].toString().repeat(raiseToSomeDegree(10, now - 3) * number) + res}"
+        else if (number == 1) res = one[now] + res
         else res = "${raz[now][number - 1] + res}"
         now++
     }
