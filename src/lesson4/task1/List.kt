@@ -5,6 +5,7 @@ package lesson4.task1
 import lesson1.task1.discriminant
 import kotlin.math.*
 import lesson3.task1.getNumber
+import java.lang.StringBuilder
 
 // Урок 4: списки
 // Максимальное количество баллов = 12
@@ -332,23 +333,23 @@ fun decimalFromString(str: String, base: Int): Int {
 fun roman(n: Int): String {
     val one = "IXCM"
     val n1 = n.toString().reversed()
-    var res = ""
     var now = 0
-    val ed = arrayListOf<String>("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
-    val des = arrayListOf<String>("X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
-    val sot = arrayListOf<String>("C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
-    val raz = arrayListOf<List<String>>(ed, des, sot)
+    val ed = listOf("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+    val des = listOf("X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
+    val sot = listOf("C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
+    val raz = listOf(ed, des, sot)
+    var res = StringBuilder()
     for (i in n1) {
         val number = i.digitToInt()
         if (number == 0) {
             now++
             continue
-        } else if (now >= 3) res = "${one[3].toString().repeat(raiseToSomeDegree(10, now - 3) * number) + res}"
-        else if (number == 1) res = one[now] + res
-        else res = "${raz[now][number - 1] + res}"
+        } else if (now >= 3) res.insert(0, one[3].toString().repeat(raiseToSomeDegree(10, now - 3) * number).toString())
+        else if (number == 1) res.insert(0, one[now])
+        else res.insert(0, raz[now][number - 1])
         now++
     }
-    return res
+    return res.toString()
 }
 
 /**

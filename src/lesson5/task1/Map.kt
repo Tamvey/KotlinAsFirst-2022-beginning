@@ -2,7 +2,7 @@
 
 package lesson5.task1
 
-import ru.spbstu.wheels.defaultCopy
+
 import kotlin.math.*
 
 // Урок 5: ассоциативные массивы и множества
@@ -120,7 +120,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
     for (i in a) {
-        if (!(b.containsKey(i.key) && b[i.key] == i.value)) return false
+        if (i.toPair() !in b.toList()) return false
     }
     return true
 }
@@ -141,7 +141,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
     for (j in b) {
-        if (j.key in a && b[j.key] == a[j.key]) a.remove(j.key)
+        if (j.toPair() in a.toList()) a.remove(j.key)
     }
 }
 
@@ -172,13 +172,12 @@ fun whoAreInBoth(a: List<String>, b: List<String>) = a.intersect(b).toList()
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
-    val res: MutableMap<String, String> = mutableMapOf()
-    for (i in mapA) res.put(i.key, i.value)
+    val res = mapA.toMutableMap()
     for (i in mapB) {
         if (i.key !in res) {
-            res.put(i.key, i.value)
+            res[i.key] = i.value
         } else {
-            if (i.value != res[i.key]) res.put(i.key, res.getValue(i.key) + ", " + i.value)
+            if (i.value != res[i.key]) res[i.key] = res[i.key] + ", " + i.value
         }
     }
     return res
@@ -232,7 +231,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
     var been = false
     for (i in stuff) {
         if (i.value.first == kind) {
-            if (i.value.second < amount || been == false) {
+            if (i.value.second < amount || !been) {
                 been = true
                 amount = i.value.second
                 name = i.key
@@ -253,13 +252,9 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    var mas = mutableSetOf<Char>()
-    for (i in word) mas.add(i)
-    mas = mas.map { it.lowercaseChar() }.toMutableSet()
+    var mas = word.toCharArray().map { it.lowercaseChar() }.toMutableSet()
     val mas2 = chars.map { it.lowercaseChar() }.toMutableSet()
-    for (i in mas2) {
-        if (i in mas) mas.remove(i)
-    }
+    if (mas2.containsAll(mas)) mas.clear()
     if (mas.isEmpty()) return true
     return false
 }
@@ -280,13 +275,12 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
     val res: MutableMap<String, Int> = mutableMapOf()
     for (i in list) {
         if (i !in res.keys) {
-            res.put(i, 0)
+            res[i] = 0
         }
-        res.put(i, res.getValue(i) + 1)
+        res[i] = res.getValue(i) + 1
     }
-    val toDelete = mutableListOf<String>()
-    for (j in res) if (j.value == 1) toDelete += j.key
-    for (j in toDelete) res.remove(j)
+    val pairsToDelete = res.filter { pair -> pair.value < 2 }
+    for (j in pairsToDelete) res.remove(j.key)
     return res
 }
 
@@ -304,13 +298,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  */
 fun giveAmountOfLetters(word: String): Map<String, Int> {
     val res: MutableMap<String, Int> = mutableMapOf()
-    for (i in word) {
-        var counter = 0
-        for (j in word) {
-            if (j == i) counter++
-        }
-        if (!res.containsKey(word)) res.put(i.toString(), counter)
-    }
+    for (i in word.toCharArray().map { it.lowercaseChar() }.toSet()) res.put(i.toString(),
+        word.toCharArray().map { it.lowercaseChar() }.count { it == i })
     return res
 }
 
