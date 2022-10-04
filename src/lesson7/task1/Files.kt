@@ -2,6 +2,8 @@
 
 package lesson7.task1
 
+import ru.spbstu.ktuples.zip
+import ru.spbstu.wheels.out
 import java.io.File
 import java.util.Stack
 
@@ -492,53 +494,48 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     ofile.write("<html>\n")
     ofile.write("<body>\n")
     ofile.write("<p>")
-    val stack = mutableListOf<String>("<p>")
-    for (line in ifile) {
-        if (line.isEmpty()) {
-            if (stack[stack.size - 1] == "<p>") {
-                ofile.write("</p>\n")
-                ofile.write("<p>")
-            } else {
-                ofile.write("<p>")
-                stack.add("<p>")
-            }
-            continue
+    val stack = Stack<String>()
+    stack.push("<p>")
+    for (l in ifile.indices) {
+        if (ifile[l].isEmpty()) {
+            ofile.write("</p>")
+            if (ifile[l + 1].isNotEmpty()) ofile.write("<p>")
         }
         var j = 0
-        while (j < line.length) {
+        while (j < ifile[l].length) {
             try {
-                if (line[j] == '*' && line[j + 1] == '*') {
-                    if (!stack.isEmpty() && stack[stack.size - 1] == "<b>") {
-                        stack.removeAt(stack.size - 1)
+                if (ifile[l][j] == '*' && ifile[l][j + 1] == '*') {
+                    if (!stack.isEmpty() && stack.peek() == "<b>") {
                         ofile.write("</b>")
+                        stack.pop()
                     } else {
-                        stack.add("<b>")
+                        stack.push("<b>")
                         ofile.write("<b>")
                     }
                     j += 1
-                } else if (line[j] == '*') {
-                    if (!stack.isEmpty() && stack[stack.size - 1] == "<i>") {
-                        stack.removeAt(stack.size - 1)
+                } else if (ifile[l][j] == '*') {
+                    if (!stack.isEmpty() && stack.peek() == "<i>") {
                         ofile.write("</i>")
+                        stack.pop()
                     } else {
-                        stack.add("<i>")
+                        stack.push("<i>")
                         ofile.write("<i>")
                     }
-                } else if (line[j] == '~' && line[j + 1] == '~') {
-                    if (!stack.isEmpty() && stack[stack.size - 1] == "<s>") {
-                        stack.removeAt(stack.size - 1)
+                } else if (ifile[l][j] == '~' && ifile[l][j + 1] == '~') {
+                    if (!stack.isEmpty() && stack.peek() == "<s>") {
                         ofile.write("</s>")
+                        stack.pop()
                     } else {
-                        stack.add("<s>")
+                        stack.push("<s>")
                         ofile.write("<s>")
                     }
                     j += 1
                 } else {
-                    ofile.write(line[j].toString())
+                    ofile.write(ifile[l][j].toString())
                 }
                 j += 1
             } catch (e: Exception) {
-                ofile.write(line[j].toString())
+                ofile.write(ifile[l][j].toString())
                 j += 1
             }
         }
@@ -716,6 +713,50 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  * - Списки, отделённые друг от друга пустой строкой, являются разными и должны оказаться в разных параграфах выходного файла.
  *
  */
+/*fun processLine(line: String): String {
+    var res = StringBuilder()
+    var j = 0
+    val stack = Stack<String>()
+    while (j < line.length) {
+        try {
+            if (line[j] == '*' && line[j + 1] == '*') {
+                if (!stack.isEmpty() && stack.peek() == "<b>") {
+                    res.append("</b>")
+                    stack.pop()
+                } else {
+                    stack.push("<b>")
+                    res.append("<b>")
+                }
+                j += 1
+            } else if (line[j] == '*') {
+                if (!stack.isEmpty() && stack.peek() == "<i>") {
+                    res.append("</i>")
+                    stack.pop()
+                } else {
+                    stack.push("<i>")
+                    res.append("<i>")
+                }
+            } else if (line[j] == '~' && line[j + 1] == '~') {
+                if (!stack.isEmpty() && stack.peek() == "<s>") {
+                    res.append("</s>")
+                    stack.pop()
+                } else {
+                    stack.push("<s>")
+                    res.append("<s>")
+                }
+                j += 1
+            } else {
+                res.append(line[j].toString())
+            }
+            j += 1
+        } catch (e: Exception) {
+            res.append(line[j].toString())
+            j += 1
+        }
+    }
+    return res.toString()
+}*/
+
 fun markdownToHtml(inputName: String, outputName: String) {
     TODO()
 }
