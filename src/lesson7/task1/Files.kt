@@ -489,18 +489,23 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
 
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    var ifile = File(inputName).readLines()
+    TODO()
+    /*var ifile = File(inputName).readLines()
     var ofile = File(outputName).bufferedWriter()
-    ofile.write("<html>\n")
-    ofile.write("<body>\n")
-    ofile.write("<p>")
+    ofile.write("<html><body><p>")
     var open = true
     val stack = Stack<String>()
-    stack.push("<p>")
     for (l in ifile.indices) {
         if (ifile[l].isEmpty()) {
-            if (open) {ofile.write("</p>"); open = false}
-            if (l != ifile.size - 1 && ifile[l + 1].isNotEmpty()) {ofile.write("<p>"); open = true}
+            if (open) {
+                ofile.write("</p>")
+                open = false
+            }
+            if (l < ifile.size - 1 && ifile[l + 1].isNotEmpty()) {
+                ofile.write("<p>")
+                open = true
+            }
+            continue
         }
         var j = 0
         while (j < ifile[l].length) {
@@ -534,18 +539,15 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 } else {
                     ofile.write(ifile[l][j].toString())
                 }
-                j += 1
             } catch (e: Exception) {
                 ofile.write(ifile[l][j].toString())
-                j += 1
             }
+            j++
         }
         ofile.write("\n")
     }
-    ofile.write("</p>")
-    ofile.write("</body>\n")
-    ofile.write("</html>\n")
-    ofile.close()
+    if (open) ofile.write("</p></body></html>")
+    ofile.close()*/
 }
 
 /**
