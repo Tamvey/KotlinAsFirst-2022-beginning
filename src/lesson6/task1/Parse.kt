@@ -77,8 +77,8 @@ fun main() {
  * входными данными.
  */
 fun dateStrToDigit(str: String): String {
-    var res = str.split(" ").toMutableList()
-    var months = listOf(
+    val res = str.split(" ").toMutableList()
+    val months = listOf(
         "января", "февраля", "марта", "апреля", "мая", "июня",
         "июля", "августа", "сентября", "октября", "ноября", "декабря"
     )
@@ -111,8 +111,8 @@ fun dateStrToDigit(str: String): String {
  */
 fun dateDigitToStr(digital: String): String {
     var ans = ""
-    var res = digital.split(".")
-    var months = listOf(
+    val res = digital.split(".")
+    val months = listOf(
         "января", "февраля", "марта", "апреля", "мая", "июня",
         "июля", "августа", "сентября", "октября", "ноября", "декабря"
     )
@@ -152,8 +152,8 @@ fun countSymbols(n: String, c: Char): Int {
 }
 
 fun flattenPhoneNumber(phone: String): String {
-    var possibleSymbols = "0123456789-+() "
-    var symbolsToInclude = "0123456789+"
+    val possibleSymbols = "0123456789-+() "
+    val symbolsToInclude = "0123456789+"
     var res = ""
     if ("()" in phone) return ""
     for (i in phone) {
@@ -209,7 +209,7 @@ fun bestLongJump(jumps: String): Int {
  * вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    var now = jumps.split(" ")
+    val now = jumps.split(" ")
     var res = -1
     if (now.size % 2 == 1) return res
     for (i in 0 until now.size) {
@@ -238,7 +238,7 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
-    var res = expression.split(" ")
+    val res = expression.split(" ")
     var ans = 0
     // Проверка на верность чередования чисел и арифмет. действий
     for (i in 1..res.size - 1) {
@@ -272,7 +272,7 @@ fun plusMinus(expression: String): Int {
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
-    var res = str.split(" ")
+    val res = str.split(" ")
     var ans = -1
     for (i in 0 until res.size - 1) {
         if (res[i].lowercase() == res[i + 1].lowercase()) {
@@ -299,22 +299,22 @@ fun firstDuplicateIndex(str: String): Int {
  * Все цены должны быть больше нуля либо равны нулю.
  */
 fun mostExpensive(description: String): String {
-    var res: List<String>
+    val res: List<String>
     if (';' in description) res = description.split(";")
     else res = listOf(description)
     var nameOfMax = ""
     var valueOfMax = -1.0
     for (i in res) {
-        var now = i.split(" ").toMutableList()
-        while (" " in now) now.remove(" ")
-        while ("" in now) now.remove("")
+        val now = i.split(" ").toMutableList().filter { it != "" && it != " " }
         if (now.size < 2) return nameOfMax
         try {
             if (now[1].toDouble() > valueOfMax) {
                 valueOfMax = now[1].toDouble()
                 nameOfMax = now[0]
             }
-        } catch (e : Exception) {return ""}
+        } catch (e: Exception) {
+            return ""
+        }
     }
     return nameOfMax
 }
@@ -331,9 +331,9 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    var ed = listOf("I", "II", "III", "IV", " ", "VI", "VII", "VIII", "IX").reversed()
-    var des = listOf("X", "XX", "XXX", "XL", " ", "LX", "LXX", "LXXX", "XC").reversed()
-    var sot = listOf("C", "CC", "CCC", "CD", " ", "DC", "DCC", "DCCC", "CM").reversed()
+    val ed = listOf("I", "II", "III", "IV", " ", "VI", "VII", "VIII", "IX").reversed()
+    val des = listOf("X", "XX", "XXX", "XL", " ", "LX", "LXX", "LXXX", "XC").reversed()
+    val sot = listOf("C", "CC", "CCC", "CD", " ", "DC", "DCC", "DCCC", "CM").reversed()
     var res = 0
     var copy = roman
     for (i in ed.indices) {
@@ -342,21 +342,27 @@ fun fromRoman(roman: String): Int {
             copy = copy.replace(ed[i], "")
         }
     }
-    if ('V' in copy) {res += 5; copy = copy.replace("V", "")}
+    if ('V' in copy) {
+        res += 5; copy = copy.replace("V", "")
+    }
     for (i in ed.indices) {
         if (des[i] in copy) {
             res += (9 - i) * 10
             copy = copy.replace(des[i], "")
         }
     }
-    if ('L' in copy) {res += 50; copy = copy.replace("L", "")}
+    if ('L' in copy) {
+        res += 50; copy = copy.replace("L", "")
+    }
     for (i in ed.indices) {
         if (sot[i] in copy) {
             res += (9 - i) * 100
             copy = copy.replace(sot[i], "")
         }
     }
-    if ('D' in copy) {res += 500; copy = copy.replace("D", "")}
+    if ('D' in copy) {
+        res += 500; copy = copy.replace("D", "")
+    }
     for (i in copy) {
         if (i == 'M') res += 1000
         else return -1
@@ -404,7 +410,7 @@ fun fromRoman(roman: String): Int {
 // Find place of ]
 fun getOut(st: String, now: Int): Int {
     var res = -1
-    var stack: MutableList<Char> = mutableListOf()
+    val stack: MutableList<Char> = mutableListOf()
 
     for (i in st.indices) {
         if (st[i] == '[') {
@@ -418,11 +424,12 @@ fun getOut(st: String, now: Int): Int {
     }
     return res
 }
+
 // Find place of [
 fun getIn(st: String, now: Int): Int {
-    var res = -1
-    var stack: MutableList<Char> = mutableListOf()
-    var places: MutableList<Int> = mutableListOf()
+    val res = -1
+    val stack: MutableList<Char> = mutableListOf()
+    val places: MutableList<Int> = mutableListOf()
     var place = 0
     for (i in st.indices) {
         if (st[i] == '[') {
@@ -439,16 +446,17 @@ fun getIn(st: String, now: Int): Int {
     }
     return res
 }
+
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    var res: MutableList<Int> = mutableListOf()
+    val res: MutableList<Int> = mutableListOf()
     for (i in 1..cells) res.add(0)
     // Check symbols
-    var possibleSymbols = "><+-[] "
+    val possibleSymbols = "><+-[] "
     for (j in commands) {
         if (j !in possibleSymbols) throw IllegalArgumentException()
     }
     // Check if '[' and ']' situated correctly
-    var stack: MutableList<Char> = mutableListOf()
+    val stack: MutableList<Char> = mutableListOf()
     for (i in commands) {
         if (i == '[') stack += '['
         if (i == ']') {
@@ -464,25 +472,20 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     while (true) {
         if (commandsHasBeenDone >= limit || placeInCommands >= commands.length) break
 
-        if (commands[placeInCommands] == ' ') {}
-        else if (commands[placeInCommands] == '-') {
+        if (commands[placeInCommands] == ' ') {
+        } else if (commands[placeInCommands] == '-') {
             res[nowPlace] -= 1
-        }
-        else if (commands[placeInCommands] == '+') {
+        } else if (commands[placeInCommands] == '+') {
             res[nowPlace] += 1
-        }
-        else if (commands[placeInCommands] == '<') {
+        } else if (commands[placeInCommands] == '<') {
             nowPlace -= 1
             if (nowPlace >= cells || nowPlace < 0) throw IllegalStateException()
-        }
-        else if (commands[placeInCommands] == '>') {
+        } else if (commands[placeInCommands] == '>') {
             nowPlace += 1
             if (nowPlace >= cells || nowPlace < 0) throw IllegalStateException()
-        }
-        else if (commands[placeInCommands] == '[') {
+        } else if (commands[placeInCommands] == '[') {
             if (res[nowPlace] == 0) placeInCommands = getOut(commands, placeInCommands)
-        }
-        else if (commands[placeInCommands] == ']') {
+        } else if (commands[placeInCommands] == ']') {
             if (res[nowPlace] != 0) placeInCommands = getIn(commands, placeInCommands)
         }
         placeInCommands++

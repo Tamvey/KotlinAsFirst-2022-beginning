@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.util.Stack
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -137,9 +138,8 @@ fun sibilants(inputName: String, outputName: String) {
             for (i in minOf(1, ifile.length - 1) until ifile.length) {
                 if (ifile[i] in letters2 && ifile[i - 1] in letters1) {
                     try {
-                        if (ifile.substring(i - 1, i + 3).lowercase() != "жури" &&
-                            ifile.substring(i - 4, i + 2).lowercase() != "брошур" &&
-                            ifile.substring(i - 5, i + 2).lowercase() != "парашут"
+                        if (ifile.substring(i - 1, i + 3).lowercase() != "жури" && ifile.substring(i - 4, i + 2)
+                                .lowercase() != "брошур" && ifile.substring(i - 5, i + 2).lowercase() != "парашут"
                         ) {
                             ofile.write(toChange.getValue(ifile[i]).toString())
                         } else ofile.write(ifile[i].toString())
@@ -326,8 +326,7 @@ fun top20Words(inputName: String): Map<String, Int> {
     listOfPairs = listOfPairs.sortedBy { it -> it.second }.reversed()
     for (i in listOfPairs.indices) {
         if (i <= 19 || (i > 19 && listOfPairs[i].second == listOfPairs[i - 1].second)) res1.put(
-            listOfPairs[i].first,
-            listOfPairs[i].second
+            listOfPairs[i].first, listOfPairs[i].second
         )
         else break
     }
@@ -485,19 +484,70 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun replaceInLine(line: String, str: String): String {
-    return ""
-}
+
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
-    /*var ifile = File(inputName).readLines()
+    var ifile = File(inputName).readLines()
     var ofile = File(outputName).bufferedWriter()
     ofile.write("<html>\n")
     ofile.write("<body>\n")
-    for
+    ofile.write("<p>")
+    val stack = mutableListOf<String>("<p>")
+    for (line in ifile) {
+        if (line.isEmpty()) {
+            if (stack[stack.size - 1] == "<p>") {
+                ofile.write("</p>\n")
+                ofile.write("<p>")
+            } else {
+                ofile.write("<p>")
+                stack.add("<p>")
+            }
+            continue
+        }
+        var j = 0
+        while (j < line.length) {
+            try {
+                if (line[j] == '*' && line[j + 1] == '*') {
+                    if (!stack.isEmpty() && stack[stack.size - 1] == "<b>") {
+                        stack.removeAt(stack.size - 1)
+                        ofile.write("</b>")
+                    } else {
+                        stack.add("<b>")
+                        ofile.write("<b>")
+                    }
+                    j += 1
+                } else if (line[j] == '*') {
+                    if (!stack.isEmpty() && stack[stack.size - 1] == "<i>") {
+                        stack.removeAt(stack.size - 1)
+                        ofile.write("</i>")
+                    } else {
+                        stack.add("<i>")
+                        ofile.write("<i>")
+                    }
+                } else if (line[j] == '~' && line[j + 1] == '~') {
+                    if (!stack.isEmpty() && stack[stack.size - 1] == "<s>") {
+                        stack.removeAt(stack.size - 1)
+                        ofile.write("</s>")
+                    } else {
+                        stack.add("<s>")
+                        ofile.write("<s>")
+                    }
+                    j += 1
+                } else {
+                    ofile.write(line[j].toString())
+                }
+                j += 1
+            } catch (e: Exception) {
+                ofile.write(line[j].toString())
+                j += 1
+            }
+        }
+        ofile.write("\n")
+    }
+    ofile.write("</p>")
     ofile.write("</body>\n")
-    ofile.write("</html>\n")*/
+    ofile.write("</html>\n")
+    ofile.close()
 }
 
 /**
@@ -597,8 +647,65 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+
+fun writeLeft(str: String, from: Int) = str.filterIndexed { index, c -> index > from }
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    var stack = Stack<Int>()
+    var spaces = -4
+    var ifile = File(inputName).readLines()
+    var ofile = File(outputName).bufferedWriter()
+    ofile.write("<html><body><p>")
+    for (line in ifile) {
+        // Counter of index
+        var j = 0
+        // Counter of spaces
+        var nowSpaces = 0
+        // Counting spaces
+        while (true) {
+            if (line[j] == ' ') {
+                nowSpaces++
+            } else break
+            j++
+        }
+        if (line[j] != '*') j = line.indexOf('.')
+        //
+        if (nowSpaces - spaces == -4) {
+            for (k in 0..1) {
+                val returned = stack.pop()
+                when (returned) {
+                    1 -> ofile.write("</ol>")
+                    0 -> ofile.write("</ul>")
+                    2 -> ofile.write("</li>")
+                }
+            }
+        }
+        if (nowSpaces - spaces == 4) {
+            if (line[j] == '.') {
+                ofile.write("<ol>")
+                ofile.write("<li>")
+                stack.push(1)
+                stack.push(2)
+            } else {
+                ofile.write("<ul>")
+                ofile.write("<li>")
+                stack.push(0)
+                stack.push(2)
+            }
+        } else {
+            ofile.write("</li>")
+            ofile.write("<li>")
+        }
+        ofile.write(writeLeft(line, j))
+        ofile.write("\n")
+        spaces = nowSpaces
+    }
+    for (i in stack.reversed()) when {
+        i == 1 -> ofile.write("</ol>")
+        i == 0 -> ofile.write("</ul>")
+        else -> ofile.write("</li>")
+    }
+    ofile.write("</p></body></html>")
+    ofile.close()
 }
 
 /**
