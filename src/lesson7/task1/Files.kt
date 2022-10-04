@@ -494,12 +494,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     ofile.write("<html>\n")
     ofile.write("<body>\n")
     ofile.write("<p>")
+    var open = true
     val stack = Stack<String>()
     stack.push("<p>")
     for (l in ifile.indices) {
         if (ifile[l].isEmpty()) {
-            ofile.write("</p>")
-            if (ifile[l + 1].isNotEmpty()) ofile.write("<p>")
+            if (open) {ofile.write("</p>"); open = false}
+            if (l != ifile.size - 1 && ifile[l + 1].isNotEmpty()) {ofile.write("<p>"); open = true}
         }
         var j = 0
         while (j < ifile[l].length) {
