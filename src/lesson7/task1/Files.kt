@@ -489,8 +489,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
 
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
-    /*var ifile = File(inputName).readLines()
+    var ifile = File(inputName).readLines()
     var ofile = File(outputName).bufferedWriter()
     ofile.write("<html><body><p>")
     var open = true
@@ -509,37 +508,33 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         }
         var j = 0
         while (j < ifile[l].length) {
-            try {
-                if (ifile[l][j] == '*' && ifile[l][j + 1] == '*') {
-                    if (!stack.isEmpty() && stack.peek() == "<b>") {
-                        ofile.write("</b>")
-                        stack.pop()
-                    } else {
-                        stack.push("<b>")
-                        ofile.write("<b>")
-                    }
-                    j += 1
-                } else if (ifile[l][j] == '*') {
-                    if (!stack.isEmpty() && stack.peek() == "<i>") {
-                        ofile.write("</i>")
-                        stack.pop()
-                    } else {
-                        stack.push("<i>")
-                        ofile.write("<i>")
-                    }
-                } else if (ifile[l][j] == '~' && ifile[l][j + 1] == '~') {
-                    if (!stack.isEmpty() && stack.peek() == "<s>") {
-                        ofile.write("</s>")
-                        stack.pop()
-                    } else {
-                        stack.push("<s>")
-                        ofile.write("<s>")
-                    }
-                    j += 1
+            if (ifile[l][j] == '*' && ifile[l].length > (j + 1) && ifile[l][j + 1] == '*') {
+                if (!stack.isEmpty() && stack.peek() == "<b>") {
+                    ofile.write("</b>")
+                    stack.pop()
                 } else {
-                    ofile.write(ifile[l][j].toString())
+                    stack.push("<b>")
+                    ofile.write("<b>")
                 }
-            } catch (e: Exception) {
+                j += 1
+            } else if (ifile[l][j] == '*') {
+                if (!stack.isEmpty() && stack.peek() == "<i>") {
+                    ofile.write("</i>")
+                    stack.pop()
+                } else {
+                    stack.push("<i>")
+                    ofile.write("<i>")
+                }
+            } else if (ifile[l][j] == '~' && ifile[l].length > (j + 1) && ifile[l][j + 1] == '~') {
+                if (!stack.isEmpty() && stack.peek() == "<s>") {
+                    ofile.write("</s>")
+                    stack.pop()
+                } else {
+                    stack.push("<s>")
+                    ofile.write("<s>")
+                }
+                j += 1
+            } else {
                 ofile.write(ifile[l][j].toString())
             }
             j++
@@ -547,7 +542,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         ofile.write("\n")
     }
     if (open) ofile.write("</p></body></html>")
-    ofile.close()*/
+    ofile.close()
 }
 
 /**
