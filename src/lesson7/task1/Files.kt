@@ -500,11 +500,11 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 ofile.write("</p>")
                 open = false
             }
-            ofile.write("\n")
-            if (l < ifile.size - 1 && ifile[l + 1].isNotEmpty()) {
+            if(!open) {
                 ofile.write("<p>")
-                open = true
+                open == true
             }
+            ofile.write("\n")
             continue
         }
         var j = 0
@@ -542,7 +542,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         }
         ofile.write("\n")
     }
-    if (open) ofile.write("</p></body></html>")
+    ofile.write("</p></body></html>")
     ofile.close()
 }
 
