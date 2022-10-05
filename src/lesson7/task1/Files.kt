@@ -500,6 +500,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 ofile.write("</p>")
                 open = false
             }
+            ofile.write("\n")
             if (l < ifile.size - 1 && ifile[l + 1].isNotEmpty()) {
                 ofile.write("<p>")
                 open = true
