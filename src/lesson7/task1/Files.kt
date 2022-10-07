@@ -489,6 +489,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
 
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
+    TODO()/*
     var ifile = File(inputName).readLines()
     var ofile = File(outputName).bufferedWriter()
     ofile.write("<html><body><p>")
@@ -543,7 +544,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         ofile.write("\n")
     }
     ofile.write("</p></body></html>")
-    ofile.close()
+    ofile.close()*/
 }
 
 /**

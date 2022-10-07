@@ -32,7 +32,10 @@ data class Square(val column: Int, val row: Int) {
  * В нотации, колонки обозначаются латинскими буквами от a до h, а ряды -- цифрами от 1 до 8.
  * Если нотация некорректна, бросить IllegalArgumentException
  */
-fun square(notation: String): Square = TODO()
+fun square(notation: String): Square {
+    var st = " abcdefgh"
+    return Square(st.indexOf(notation[0]), notation[1].digitToInt())
+}
 
 /**
  * Простая (2 балла)
@@ -181,7 +184,45 @@ fun kingTrajectory(start: Square, end: Square): List<Square> = TODO()
  * Пример: knightMoveNumber(Square(3, 1), Square(6, 3)) = 3.
  * Конь может последовательно пройти через клетки (5, 2) и (4, 4) к клетке (6, 3).
  */
-fun knightMoveNumber(start: Square, end: Square): Int = TODO()
+fun getPossibleMoves(sq: Square): MutableList<Square> {
+    var res = mutableListOf<Square>()
+    for (i in listOf(-2, 2)) {
+        for (j in listOf(-1, 1)) {
+            if (sq.column + i in 1..8 && sq.row + j in 1..8) res.add(Square(sq.column + i, sq.row + j))
+            if (sq.column + j in 1..8 && sq.row + i in 1..8) res.add(Square(sq.column + j, sq.row + i))
+        }
+    }
+    return res
+}
+
+// Решение очень похоже на волновой алгоритм в графе
+fun knightMoveNumber(start: Square, end: Square): Int {
+    if (start == end) return 0
+    if (start.column !in 1..8 || start.row !in 1..8 ||
+        end.column !in 1..8 || end.row !in 1..8
+    ) throw IllegalArgumentException()
+    var mas = mutableListOf<MutableList<Int>>()
+    for (i in 0..8) {
+        var now = mutableListOf<Int>()
+        for (j in 0..8) now.add(0)
+        mas.add(now)
+    }
+    var sqs = getPossibleMoves(start)
+    var now = 1
+    while (true) {
+        var new = mutableSetOf<Square>()
+        for (j in sqs) {
+            if (mas[j.column][j.row] > now || mas[j.column][j.row] == 0) {
+                new += getPossibleMoves(j)
+                mas[j.column][j.row] = now
+            }
+        }
+        if (new.isEmpty()) break
+        sqs = new.toMutableList()
+        now++
+    }
+    return mas[end.column][end.row]
+}
 
 /**
  * Очень сложная (10 баллов)
@@ -203,4 +244,37 @@ fun knightMoveNumber(start: Square, end: Square): Int = TODO()
  *
  * Если возможно несколько вариантов самой быстрой траектории, вернуть любой из них.
  */
-fun knightTrajectory(start: Square, end: Square): List<Square> = TODO()
+
+// Решение аналогично прошлому, нужно лишь дополнительно сохранять предыдущие ходы
+
+fun knightTrajectory(start: Square, end: Square): List<Square> {
+    if (start == end) return listOf(start)
+    var mas = mutableListOf<MutableList<Int>>()
+    for (i in 0..8) {
+        var now = mutableListOf<Int>()
+        for (j in 0..8) now.add(0)
+        mas.add(now)
+    }
+    var memorizeMoves = mutableMapOf<Square, MutableList<Square>>()
+    memorizeMoves.put(start, mutableListOf(start))
+
+    var sqs = mutableMapOf<Square, MutableList<Square>>()
+    sqs.put(start, getPossibleMoves(start))
+    var now = 1
+    while (true) {
+        var new = mutableMapOf<Square, MutableList<Square>>()
+        for (j in sqs) {
+            for (k in j.value) {
+                if (mas[k.column][k.row] > now || mas[k.column][k.row] == 0) {
+                    mas[k.column][k.row] = now
+                    memorizeMoves.put(k, memorizeMoves.getValue(j.key).plus(listOf(k)).toMutableList())
+                    new.put(k, getPossibleMoves(k))
+                }
+            }
+        }
+        if (new.isEmpty()) break
+        sqs = new
+        now++
+    }
+    return memorizeMoves.getValue(end)
+}
