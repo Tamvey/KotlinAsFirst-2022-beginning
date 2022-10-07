@@ -35,6 +35,7 @@ data class Square(val column: Int, val row: Int) {
 fun square(notation: String): Square {
     var st = " abcdefgh"
     if (st.indexOf(notation[0]) !in 1..8) throw IllegalArgumentException()
+    if (notation[1].digitToInt() !in 1..8) throw IllegalArgumentException()
     return Square(st.indexOf(notation[0]), notation[1].digitToInt())
 }
 
@@ -198,10 +199,10 @@ fun getPossibleMoves(sq: Square): MutableList<Square> {
 
 // Решение очень похоже на волновой алгоритм в графе
 fun knightMoveNumber(start: Square, end: Square): Int {
-    if (start == end) return 0
     if (start.column !in 1..8 || start.row !in 1..8 ||
         end.column !in 1..8 || end.row !in 1..8
     ) throw IllegalArgumentException()
+    if (start == end) return 0
     var mas = mutableListOf<MutableList<Int>>()
     for (i in 0..8) {
         var now = mutableListOf<Int>()
