@@ -34,6 +34,7 @@ data class Square(val column: Int, val row: Int) {
  */
 fun square(notation: String): Square {
     var st = " abcdefgh"
+    if (st.indexOf(notation[0]) !in 1..8) throw IllegalArgumentException()
     return Square(st.indexOf(notation[0]), notation[1].digitToInt())
 }
 
