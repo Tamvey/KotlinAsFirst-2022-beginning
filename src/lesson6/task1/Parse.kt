@@ -331,6 +331,7 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
+    for (i in roman) if (i !in "IXVLCDM") return -1
     val ed = listOf("I", "II", "III", "IV", " ", "VI", "VII", "VIII", "IX").reversed()
     val des = listOf("X", "XX", "XXX", "XL", " ", "LX", "LXX", "LXXX", "XC").reversed()
     val sot = listOf("C", "CC", "CCC", "CD", " ", "DC", "DCC", "DCCC", "CM").reversed()
