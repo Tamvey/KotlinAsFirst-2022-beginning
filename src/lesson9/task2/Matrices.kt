@@ -246,11 +246,17 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 3 10 11  8
  */
 fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
-    for (i in matrix.allCells) {
-        if (i.second == value) return i.first
+    for (i in 0..7) {
+        for (j in 0..7) {
+            try {
+                if (matrix.get(i, j) == value) return Cell(i, j)
+            } catch (e: Exception) {
+            }
+        }
     }
     return Cell(-1, -1)
 }
+
 fun getPossibleMove(coordinates: Cell): List<Cell> {
     val res = mutableListOf<Cell>()
     if (coordinates.row + 1 in 0..7) res += Cell(coordinates.row + 1, coordinates.column)
