@@ -1,4 +1,4 @@
-package lesson9.lesson10.task2
+package lesson10.task2
 
 import lesson10.task2.convertToHtmlTable
 import lesson10.task2.convertToHtmlTableUsingKotlinxHtml

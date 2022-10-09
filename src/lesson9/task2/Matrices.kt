@@ -2,8 +2,8 @@
 
 package lesson9.task2
 
-import lesson9.task1.Matrix
-import lesson9.task1.createMatrix
+import lesson9.task1.*
+import kotlin.math.*
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -245,7 +245,27 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO()
+fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
+    for (i in matrix.allCells) {
+        if (i.second == value) return i.first
+    }
+    return Cell(-1, -1)
+}
+
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    for (i in 0..15) if (getByValue(matrix, i) == Cell(-1, -1)) throw IllegalStateException()
+    var placeOfEmpty = getByValue(matrix, 0)
+    for (i in moves) {
+        if (i !in 1..15) throw IllegalStateException()
+        val now = getByValue(matrix, i)
+        // Проверка на верность расположения
+        if ( (abs(now.row - placeOfEmpty.row) + abs(now.column - placeOfEmpty.column)) != 1) throw IllegalStateException()
+        matrix.set(placeOfEmpty, i)
+        matrix.set(now, 0)
+        placeOfEmpty = now
+    }
+    return matrix
+}
 
 /**
  * Очень сложная (32 балла)
@@ -286,4 +306,56 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO(
  *
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO()
+
+fun getPossibleMove(coord: Cell): List<Cell> {
+    val res = mutableListOf<Cell>()
+    if (coord.row + 1 in 0..7) res += Cell(coord.row + 1, coord.column)
+    if (coord.row - 1 in 0..7) res += Cell(coord.row - 1, coord.column)
+    if (coord.column + 1 in 0..7) res += Cell(coord.row, coord.column + 1)
+    if (coord.column - 1 in 0..7) res += Cell(coord.row, coord.column - 1)
+    return res
+}
+
+fun clone(matrix: Matrix<Int>): Matrix<Int> {
+    val res = createMatrix(matrix.height, matrix.width, 0)
+    for (i in 0 until matrix.height) {
+        for (j in 0 until matrix.width) {
+            res.set(Cell(i, j), matrix.get(Cell(i, j)))
+        }
+    }
+    return res
+}
+
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    val pos1 = createMatrix(
+        4, 4, listOf(
+            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
+            listOf(9, 10, 11, 12), listOf(13, 14, 15, 0)
+        )
+    )
+    val pos2 = createMatrix(
+        4, 4, listOf(
+            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
+            listOf(9, 10, 11, 12), listOf(13, 15, 14, 0)
+        )
+    )
+    val memorize = mutableMapOf<MutableList<Int>, Matrix<Int>>()
+    memorize.put(mutableListOf(0), clone(matrix))
+    if (memorize.getValue(mutableListOf(0)) == pos1 || memorize.getValue(mutableListOf(0)) == pos2) return listOf(0)
+    while (true) {
+        val new = mutableMapOf<MutableList<Int>, Matrix<Int>>()
+        for (i in memorize) {
+            for (j in getPossibleMove(getByValue(i.value, i.key[i.key.size - 1]))) {
+                val newMat = clone(i.value)
+                val now = getByValue(newMat, newMat.get(j))
+                val empty = getByValue(newMat, 0)
+                newMat.set(empty, newMat.get(now))
+                newMat.set(now, 0)
+                val toPut = i.key
+                toPut.add(newMat.get(j))
+                if (newMat == pos1 || newMat == pos2) return toPut
+                new.put(toPut, newMat)
+            }
+        }
+    }
+}

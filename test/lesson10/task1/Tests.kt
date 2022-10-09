@@ -1,4 +1,4 @@
-package lesson9.lesson10.task1
+package lesson10.task1
 
 import lesson10.task1.Expression
 import org.junit.jupiter.api.Tag
