@@ -11,6 +11,7 @@ import java.lang.IllegalArgumentException
  * Ячейка матрицы: row = ряд, column = колонка
  */
 data class Cell(val row: Int, val column: Int)
+data class MutablePair<E, T>(var first: E, var second: T)
 
 /**
  * Интерфейс, описывающий возможности матрицы. E = тип элемента матрицы
@@ -42,7 +43,6 @@ interface Matrix<E> {
     operator fun set(cell: Cell, value: E)
 }
 
-data class MutablePair<E, T>(var first: E, var second: T)
 
 /**
  * Простая (2 балла)
@@ -59,12 +59,12 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl<E>(h
  * Реализация интерфейса "матрица"
  */
 class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : Matrix<E> {
-    override val allCells = mutableListOf<MutablePair<Cell, E>>()
+    override val allCells: MutableList<MutablePair<Cell, E>> = mutableListOf()
 
     init {
         for (i in 0 until height) {
             for (j in 0 until width) {
-                allCells.add(MutablePair(Cell(i, j), e))
+                this.allCells.add(MutablePair(Cell(i, j), e))
             }
         }
     }
