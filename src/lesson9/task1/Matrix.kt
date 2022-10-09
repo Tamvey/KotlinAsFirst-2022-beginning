@@ -23,7 +23,7 @@ interface Matrix<E> {
     val width: Int
 
     /** Все элементы */
-    var allCells: MutableList<MutablePair<Cell, E>>
+    val allCells: MutableList<MutablePair<Cell, E>>
 
     /**
      * Доступ к ячейке.
@@ -58,8 +58,8 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl<E>(h
  *
  * Реализация интерфейса "матрица"
  */
-class MatrixImpl<E>(private val heightToSet: Int,private val widthToSet: Int, private val e: E) : Matrix<E> {
-    override var allCells = mutableListOf<MutablePair<Cell, E>>()
+class MatrixImpl<E>(private val heightToSet: Int, private val widthToSet: Int, private val e: E) : Matrix<E> {
+    override val allCells = mutableListOf<MutablePair<Cell, E>>()
 
     init {
         for (i in 0 until heightToSet) {
