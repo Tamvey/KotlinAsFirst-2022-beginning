@@ -160,6 +160,7 @@ fun flattenPhoneNumber(phone: String): String {
         if (i !in possibleSymbols) return ""
         if (i in symbolsToInclude) res += i
     }
+    for (i in "1234567890") if (i !in phone) return ""
     if (countSymbols(res, '+') > 1 || (countSymbols(res, '+') == 1 && res[0] != '+')) return ""
     if (countSymbols(res, '(') != countSymbols(res, ')')) return ""
     // Counting of '(' and ')'

@@ -355,6 +355,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
             if (i.key.isEmpty()) {
                 for (j in getPossibleMove(getByValue(i.value, 0))) {
                     val newMat = clone(i.value)
+                    if (newMat == pos1 || newMat == pos2) return i.key
                     val now = getByValue(newMat, newMat.get(j))
                     val empty = getByValue(newMat, 0)
                     newMat.set(empty, newMat.get(now))
@@ -367,6 +368,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
             } else {
                 for (j in getPossibleMove(getByValue(i.value, i.key[i.key.size - 1]))) {
                     val newMat = clone(i.value)
+                    if (newMat == pos1 || newMat == pos2) return return i.key
                     val now = getByValue(newMat, newMat.get(j))
                     val empty = getByValue(newMat, 0)
                     newMat.set(empty, newMat.get(now))
