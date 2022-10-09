@@ -251,18 +251,28 @@ fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
     }
     return Cell(-1, -1)
 }
+fun getPossibleMove(coordinates: Cell): List<Cell> {
+    val res = mutableListOf<Cell>()
+    if (coordinates.row + 1 in 0..7) res += Cell(coordinates.row + 1, coordinates.column)
+    if (coordinates.row - 1 in 0..7) res += Cell(coordinates.row - 1, coordinates.column)
+    if (coordinates.column + 1 in 0..7) res += Cell(coordinates.row, coordinates.column + 1)
+    if (coordinates.column - 1 in 0..7) res += Cell(coordinates.row, coordinates.column - 1)
+    return res
+}
 
 fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
-    for (i in 0..15) if (getByValue(matrix, i) == Cell(-1, -1)) throw IllegalStateException()
-    var placeOfEmpty = getByValue(matrix, 0)
-    for (i in moves) {
-        if (i !in 1..15) throw IllegalStateException()
+    for (i in 0..15) {
         val now = getByValue(matrix, i)
+        if (now == Cell(-1, -1)) throw IllegalStateException()
+        if (now.row !in 0..7 || now.column !in 0..7) throw IllegalStateException()
+    }
+    for (i in moves) {
+        val now = getByValue(matrix, i)
+        val placeOfEmpty = getByValue(matrix, 0)
         // Проверка на верность расположения
-        if ( (abs(now.row - placeOfEmpty.row) + abs(now.column - placeOfEmpty.column)) != 1) throw IllegalStateException()
+        //if (!getPossibleMove(placeOfEmpty).contains(now)) throw IllegalStateException()
         matrix.set(placeOfEmpty, i)
         matrix.set(now, 0)
-        placeOfEmpty = now
     }
     return matrix
 }
@@ -307,15 +317,6 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
 
-fun getPossibleMove(coord: Cell): List<Cell> {
-    val res = mutableListOf<Cell>()
-    if (coord.row + 1 in 0..7) res += Cell(coord.row + 1, coord.column)
-    if (coord.row - 1 in 0..7) res += Cell(coord.row - 1, coord.column)
-    if (coord.column + 1 in 0..7) res += Cell(coord.row, coord.column + 1)
-    if (coord.column - 1 in 0..7) res += Cell(coord.row, coord.column - 1)
-    return res
-}
-
 fun clone(matrix: Matrix<Int>): Matrix<Int> {
     val res = createMatrix(matrix.height, matrix.width, 0)
     for (i in 0 until matrix.height) {
@@ -340,21 +341,34 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
         )
     )
     val memorize = mutableMapOf<MutableList<Int>, Matrix<Int>>()
-    memorize.put(mutableListOf(0), clone(matrix))
-    if (memorize.getValue(mutableListOf(0)) == pos1 || memorize.getValue(mutableListOf(0)) == pos2) return listOf(0)
+    memorize.put(mutableListOf(), clone(matrix))
+    if (memorize.getValue(mutableListOf()) == pos1 || memorize.getValue(mutableListOf()) == pos2) return listOf(0)
     while (true) {
         val new = mutableMapOf<MutableList<Int>, Matrix<Int>>()
         for (i in memorize) {
-            for (j in getPossibleMove(getByValue(i.value, i.key[i.key.size - 1]))) {
-                val newMat = clone(i.value)
-                val now = getByValue(newMat, newMat.get(j))
-                val empty = getByValue(newMat, 0)
-                newMat.set(empty, newMat.get(now))
-                newMat.set(now, 0)
-                val toPut = i.key
-                toPut.add(newMat.get(j))
-                if (newMat == pos1 || newMat == pos2) return toPut
-                new.put(toPut, newMat)
+            if (i.key.isEmpty()) {
+                for (j in getPossibleMove(getByValue(i.value, 0))) {
+                    val newMat = clone(i.value)
+                    val now = getByValue(newMat, newMat.get(j))
+                    val empty = getByValue(newMat, 0)
+                    newMat.set(empty, newMat.get(now))
+                    newMat.set(now, 0)
+                    val toPut = mutableListOf(newMat.get(j))
+                    if (newMat == pos1 || newMat == pos2) return toPut
+                    new.put(toPut, newMat)
+                }
+            } else {
+                for (j in getPossibleMove(getByValue(i.value, i.key[i.key.size - 1]))) {
+                    val newMat = clone(i.value)
+                    val now = getByValue(newMat, newMat.get(j))
+                    val empty = getByValue(newMat, 0)
+                    newMat.set(empty, newMat.get(now))
+                    newMat.set(now, 0)
+                    val toPut = i.key
+                    toPut.add(newMat.get(j))
+                    if (newMat == pos1 || newMat == pos2) return toPut
+                    new.put(toPut, newMat)
+                }
             }
         }
     }
