@@ -359,7 +359,8 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
                     val empty = getByValue(newMat, 0)
                     newMat.set(empty, newMat.get(now))
                     newMat.set(now, 0)
-                    val toPut = mutableListOf(newMat.get(j))
+                    val toPut = i.key
+                    toPut.add(newMat.get(j))
                     if (newMat == pos1 || newMat == pos2) return toPut
                     new.put(toPut, newMat)
                 }
