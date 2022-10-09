@@ -270,7 +270,7 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
         val now = getByValue(matrix, i)
         val placeOfEmpty = getByValue(matrix, 0)
         // Проверка на верность расположения
-        //if (!getPossibleMove(placeOfEmpty).contains(now)) throw IllegalStateException()
+        if (!getPossibleMove(placeOfEmpty).contains(now)) throw IllegalStateException()
         matrix.set(placeOfEmpty, i)
         matrix.set(now, 0)
     }
@@ -342,7 +342,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     )
     val memorize = mutableMapOf<MutableList<Int>, Matrix<Int>>()
     memorize.put(mutableListOf(), clone(matrix))
-    if (memorize.getValue(mutableListOf()) == pos1 || memorize.getValue(mutableListOf()) == pos2) return listOf(0)
+    if (memorize.getValue(mutableListOf()) == pos1 || memorize.getValue(mutableListOf()) == pos2) return listOf()
     while (true) {
         val new = mutableMapOf<MutableList<Int>, Matrix<Int>>()
         for (i in memorize) {
