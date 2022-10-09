@@ -58,20 +58,17 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl<E>(h
  *
  * Реализация интерфейса "матрица"
  */
-class MatrixImpl<E>(private val heightToSet: Int, private val widthToSet: Int, private val e: E) : Matrix<E> {
+class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : Matrix<E> {
     override val allCells = mutableListOf<MutablePair<Cell, E>>()
 
     init {
-        for (i in 0 until heightToSet) {
-            for (j in 0 until widthToSet) {
+        for (i in 0 until height) {
+            for (j in 0 until width) {
                 allCells.add(MutablePair(Cell(i, j), e))
             }
         }
     }
 
-    override val width: Int = allCells[allCells.size - 1].first.column + 1
-
-    override val height: Int = allCells[allCells.size - 1].first.row + 1
 
     override fun get(row: Int, column: Int): E {
         for (i in allCells) {
@@ -81,13 +78,7 @@ class MatrixImpl<E>(private val heightToSet: Int, private val widthToSet: Int, p
         throw IllegalArgumentException()
     }
 
-    override fun get(cell: Cell): E {
-        for (i in allCells) {
-            if (i.first == cell)
-                return i.second
-        }
-        throw IllegalArgumentException()
-    }
+    override fun get(cell: Cell) = get(cell.row, cell.column)
 
     override fun set(row: Int, column: Int, value: E) {
         for (i in allCells) {
@@ -99,15 +90,7 @@ class MatrixImpl<E>(private val heightToSet: Int, private val widthToSet: Int, p
         throw IllegalArgumentException()
     }
 
-    override fun set(cell: Cell, value: E) {
-        for (i in allCells) {
-            if (i.first == cell) {
-                i.second = value
-                return
-            }
-        }
-        throw IllegalArgumentException()
-    }
+    override fun set(cell: Cell, value: E) = set(cell.row, cell.column, value)
 
     // Взял реализацию из теории к уроку
     override fun equals(other: Any?) = other is MatrixImpl<*> && height == other.height && width == other.width
