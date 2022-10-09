@@ -259,10 +259,10 @@ fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
 
 fun getPossibleMove(coordinates: Cell): List<Cell> {
     val res = mutableListOf<Cell>()
-    if (coordinates.row + 1 in 0..7) res += Cell(coordinates.row + 1, coordinates.column)
-    if (coordinates.row - 1 in 0..7) res += Cell(coordinates.row - 1, coordinates.column)
-    if (coordinates.column + 1 in 0..7) res += Cell(coordinates.row, coordinates.column + 1)
-    if (coordinates.column - 1 in 0..7) res += Cell(coordinates.row, coordinates.column - 1)
+    if (coordinates.row + 1 in 0..3) res += Cell(coordinates.row + 1, coordinates.column)
+    if (coordinates.row - 1 in 0..3) res += Cell(coordinates.row - 1, coordinates.column)
+    if (coordinates.column + 1 in 0..3) res += Cell(coordinates.row, coordinates.column + 1)
+    if (coordinates.column - 1 in 0..3) res += Cell(coordinates.row, coordinates.column - 1)
     return res
 }
 
@@ -332,23 +332,31 @@ fun clone(matrix: Matrix<Int>): Matrix<Int> {
     }
     return res
 }
+fun hasSame(matrix: Matrix<Int>, matrix1: Matrix<Int>): Boolean {
+    for (i in 0..3){
+        for (j in 0..3) {
+            if (matrix.get(i, j) != matrix1.get(i, j)) return false
+        }
+    }
+    return true
+}
 
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
-    val pos1 = createMatrix(
-        4, 4, listOf(
-            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
-            listOf(9, 10, 11, 12), listOf(13, 14, 15, 0)
-        )
-    )
-    val pos2 = createMatrix(
-        4, 4, listOf(
-            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
-            listOf(9, 10, 11, 12), listOf(13, 15, 14, 0)
-        )
-    )
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO() /*{
+    val pos1 = createMatrix(4, 4, 0)
+    val pos2 = createMatrix(4, 4, 0)
+    var vall = 1
+    for (i in 0..3){
+        for (j in 0..3) {
+            pos1.set(i, j, vall)
+            pos2.set(i, j, vall)
+            vall++
+        }
+    }
+    pos1.set(3, 3, 0); pos2.set(3, 3, 0)
+    pos2.set(3, 2, 14); pos2.set(3, 1, 15)
     val memorize = mutableMapOf<MutableList<Int>, Matrix<Int>>()
     memorize.put(mutableListOf(), clone(matrix))
-    if (memorize.getValue(mutableListOf()) == pos1 || memorize.getValue(mutableListOf()) == pos2) return listOf()
+    if (hasSame(matrix, pos1) || hasSame(matrix, pos1)) return listOf()
     while (true) {
         val new = mutableMapOf<MutableList<Int>, Matrix<Int>>()
         for (i in memorize) {
@@ -361,7 +369,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
                     newMat.set(now, 0)
                     val toPut = i.key
                     toPut.add(newMat.get(j))
-                    if (newMat == pos1 || newMat == pos2) return toPut
+                    if (hasSame(newMat, pos1) || hasSame(newMat, pos2)) return toPut
                     new.put(toPut, newMat)
                 }
             } else {
@@ -373,10 +381,10 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
                     newMat.set(now, 0)
                     val toPut = i.key
                     toPut.add(newMat.get(j))
-                    if (newMat == pos1 || newMat == pos2) return toPut
+                    if (hasSame(newMat, pos1) || hasSame(newMat, pos2)) return toPut
                     new.put(toPut, newMat)
                 }
             }
         }
     }
-}
+}*/
