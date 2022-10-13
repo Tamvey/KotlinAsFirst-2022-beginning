@@ -270,13 +270,13 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
     for (i in 0..15) {
         val now = getByValue(matrix, i)
         if (now == Cell(-1, -1)) throw IllegalStateException()
-        if (now.row !in 0..7 || now.column !in 0..7) throw IllegalStateException()
+        if (now.row !in 0 until matrix.height || now.column !in 0 until matrix.width) throw IllegalStateException()
     }
     for (i in moves) {
         val now = getByValue(matrix, i)
         val placeOfEmpty = getByValue(matrix, 0)
         // Проверка на верность расположения
-        if (!getPossibleMove(placeOfEmpty).contains(now)) throw IllegalStateException()
+        //if (!getPossibleMove(placeOfEmpty).contains(now)) throw IllegalStateException()
         matrix.set(placeOfEmpty, i)
         matrix.set(now, 0)
     }
@@ -332,8 +332,14 @@ fun clone(matrix: Matrix<Int>): Matrix<Int> {
     }
     return res
 }
+fun cloneList(f: List<Int>): MutableList<Int> {
+    val newList = mutableListOf<Int>()
+    for (i in f) newList += i
+    return newList
+}
+
 fun hasSame(matrix: Matrix<Int>, matrix1: Matrix<Int>): Boolean {
-    for (i in 0..3){
+    for (i in 0..3) {
         for (j in 0..3) {
             if (matrix.get(i, j) != matrix1.get(i, j)) return false
         }
@@ -341,11 +347,11 @@ fun hasSame(matrix: Matrix<Int>, matrix1: Matrix<Int>): Boolean {
     return true
 }
 
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO() /*{
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     val pos1 = createMatrix(4, 4, 0)
     val pos2 = createMatrix(4, 4, 0)
     var vall = 1
-    for (i in 0..3){
+    for (i in 0..3) {
         for (j in 0..3) {
             pos1.set(i, j, vall)
             pos2.set(i, j, vall)
@@ -354,37 +360,28 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO() /*{
     }
     pos1.set(3, 3, 0); pos2.set(3, 3, 0)
     pos2.set(3, 2, 14); pos2.set(3, 1, 15)
-    val memorize = mutableMapOf<MutableList<Int>, Matrix<Int>>()
+    println(matrix)
+    var memorize = mutableMapOf<MutableList<Int>, Matrix<Int>>()
     memorize.put(mutableListOf(), clone(matrix))
-    if (hasSame(matrix, pos1) || hasSame(matrix, pos1)) return listOf()
+    if (hasSame(matrix, pos1) || hasSame(matrix, pos2)) return listOf()
+    var al = mutableSetOf(mutableListOf<Int>())
     while (true) {
-        val new = mutableMapOf<MutableList<Int>, Matrix<Int>>()
+        val new1 = mutableMapOf<MutableList<Int>, Matrix<Int>>()
         for (i in memorize) {
-            if (i.key.isEmpty()) {
-                for (j in getPossibleMove(getByValue(i.value, 0))) {
-                    val newMat = clone(i.value)
-                    val now = getByValue(newMat, newMat.get(j))
-                    val empty = getByValue(newMat, 0)
-                    newMat.set(empty, newMat.get(now))
-                    newMat.set(now, 0)
-                    val toPut = i.key
-                    toPut.add(newMat.get(j))
-                    if (hasSame(newMat, pos1) || hasSame(newMat, pos2)) return toPut
-                    new.put(toPut, newMat)
-                }
-            } else {
-                for (j in getPossibleMove(getByValue(i.value, i.key[i.key.size - 1]))) {
-                    val newMat = clone(i.value)
-                    val now = getByValue(newMat, newMat.get(j))
-                    val empty = getByValue(newMat, 0)
-                    newMat.set(empty, newMat.get(now))
-                    newMat.set(now, 0)
-                    val toPut = i.key
-                    toPut.add(newMat.get(j))
-                    if (hasSame(newMat, pos1) || hasSame(newMat, pos2)) return toPut
-                    new.put(toPut, newMat)
-                }
+            for (j in getPossibleMove(getByValue(i.value, 0))) {
+                if (i.key.size > 0 && i.key[i.key.size - 1] == i.value.get(j)) continue
+                val new = clone(i.value)
+                val toAdd = new.get(j)
+                new.set(getByValue(new, 0), toAdd)
+                new.set(j, 0)
+                val newMoves = cloneList(i.key)
+                newMoves.add(toAdd)
+                //println(newMoves)
+                if (hasSame(new, pos1) || hasSame(new, pos2)) return newMoves
+                new1.put(newMoves, new)
             }
         }
+        memorize.clear()
+        for (i in new1) if (i.key.size <= 80) memorize.put(i.key, i.value)
     }
-}*/
+}
