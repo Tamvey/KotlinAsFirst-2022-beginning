@@ -3,6 +3,7 @@
 package lesson6.task1
 
 import lesson2.task2.daysInMonth
+import java.lang.StringBuilder
 
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
@@ -84,12 +85,13 @@ fun dateStrToDigit(str: String): String {
     )
     var ans = ""
     try {
-        if (res.get(1) !in months || res.get(0).toInt() !in 1..31 || res.size > 3) {
+        val res0ToInt = res[0].toInt()
+        val res2ToInt = res[2].toInt()
+        if (res[1] !in months || res0ToInt !in 1..31 || res.size > 3) {
             return ans
         }
-        if (daysInMonth(months.indexOf(res.get(1)) + 1, res.get(2).toInt()) < res.get(0).toInt()) return ans
-        if (res[0].length == 1) res[0] = "0" + res[0]
-        ans += res[0] + "."
+        if (daysInMonth(months.indexOf(res[1]) + 1, res2ToInt) < res0ToInt) return ans
+        ans += twoDigitStr(res[0].toInt()) + "."
         if ((months.indexOf(res[1]) + 1).toString().length == 1) ans += "0" + (months.indexOf(res[1]) + 1).toString()
         else ans += (months.indexOf(res[1]) + 1).toString()
         ans += "." + res[2]
@@ -117,11 +119,11 @@ fun dateDigitToStr(digital: String): String {
         "июля", "августа", "сентября", "октября", "ноября", "декабря"
     )
     try {
-        if (res.get(1).toInt() !in 1..12 || res.get(0).toInt() !in 1..31 || res.size > 3) {
+        if (res[1].toInt() !in 1..12 || res[0].toInt() !in 1..31 || res.size > 3) {
             return ans
         }
-        if (daysInMonth(res.get(1).toInt(), res.get(2).toInt()) < res.get(0).toInt()) return ans
-        ans = "${res.get(0).toInt()} ${months[res.get(1).toInt() - 1]} ${res.get(2).toInt()}"
+        if (daysInMonth(res[1].toInt(), res[2].toInt()) < res[0].toInt()) return ans
+        ans = "${res[0].toInt()} ${months[res[1].toInt() - 1]} ${res[2].toInt()}"
     } catch (e: Exception) {
         return ans
     }
@@ -152,16 +154,14 @@ fun countSymbols(n: String, c: Char): Int {
 }
 
 fun flattenPhoneNumber(phone: String): String {
-    val possibleSymbols = "0123456789-+() "
-    val symbolsToInclude = "0123456789+"
-    var res = ""
+    if (Regex("""[^0123456789+() -]""").find(phone) != null) return ""
     if ("()" in phone) return ""
-    for (i in phone) {
-        if (i !in possibleSymbols) return ""
-        if (i in symbolsToInclude) res += i
+    var res = buildString {
+        for (i in phone) {
+            if (i in "01234567890+") append(i)
+        }
     }
-    if (countSymbols(res, '+') > 1 || (countSymbols(res, '+') == 1 && res[0] != '+')) return ""
-    if (countSymbols(res, '(') != countSymbols(res, ')')) return ""
+    if (countSymbols(res, '+') >= 1 && res[0] != '+') return ""
     // Counting of '(' and ')'
     var c = 0
     for (i in phone) {
@@ -183,18 +183,17 @@ fun flattenPhoneNumber(phone: String): String {
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 fun bestLongJump(jumps: String): Int {
-    var ans = -1
-    var now = ""
-    for (j in jumps) {
-        if (j !in "0123456789-% ") return -1
-        if (j in "0123456789") now += j
-        else {
-            if (now.length != 0) ans = maxOf(now.toInt(), ans)
-            now = ""
-        }
+    var bufer = jumps.toString()
+    bufer = Regex("""[%-]""").replace(bufer, "")
+    if (Regex("""[^0-9 ]""").find(bufer) != null) return -1
+    var res = 0
+    for (i in bufer.split(" ")) {
+        if (i == "") continue
+        if (res == 0) res = i.toInt()
+        res = maxOf(i.toInt(), res)
     }
-    if (now.length != 0) ans = maxOf(now.toInt(), ans)
-    return ans
+    if (res == 0) return -1
+    return res
 }
 
 /**
@@ -209,23 +208,17 @@ fun bestLongJump(jumps: String): Int {
  * вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    val now = jumps.split(" ")
-    var res = -1
-    if (now.size % 2 == 1) return res
-    for (i in 0 until now.size) {
-        for (j in "01234567890") {
-            if (i % 2 == 1 && j in now[i]) return res
-        }
-        for (j in "-+%") {
-            if (i % 2 == 0 && j in now[i]) return res
+    if (Regex("""[^0-9\+%\- ]""").find(jumps) != null) return -1
+    if (Regex("""\+""").find(jumps) == null || Regex("""[0-9]""").find(jumps) == null) return -1
+    var maxx = 0
+    val mas = jumps.split(" ")
+    for (i in mas.indices) {
+        if (i + 1 < mas.size && mas[i + 1].contains("+") && mas[i].any { it.isDigit() }) {
+            maxx = maxOf(maxx, mas[i].toInt())
         }
     }
-    for (i in 0 until now.size step 2) {
-        if (now[i + 1][0] == '+') {
-            res = maxOf(res, now[i].toInt())
-        }
-    }
-    return res
+    if (maxx == 0) return -1
+    return maxx
 }
 
 /**
@@ -247,9 +240,7 @@ fun plusMinus(expression: String): Int {
     }
     // Проверка на наличие допустимых знаков
     for (j in res) {
-        for (i in j) {
-            if (i !in "0123456789+-") throw IllegalArgumentException()
-        }
+        if (Regex("""[^0-9\+\-]""").find(j) != null) throw IllegalArgumentException()
     }
     // Если первый или второй элемент в res - арифметю опер.
     if (("+" in res[0] || "-" in res[0]) || ("+" in res[res.size - 1] || "-" in res[res.size - 1])) throw IllegalArgumentException()
@@ -272,10 +263,10 @@ fun plusMinus(expression: String): Int {
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
-    val res = str.split(" ")
+    val res = str.lowercase().split(" ")
     var ans = -1
     for (i in 0 until res.size - 1) {
-        if (res[i].lowercase() == res[i + 1].lowercase()) {
+        if (res[i] == res[i + 1]) {
             for (k in 0 until i) {
                 ans += res[k].length
                 ans++
@@ -300,12 +291,11 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     val res: List<String>
-    if (';' in description) res = description.split(";")
-    else res = listOf(description)
+    res = description.split(";")
     var nameOfMax = ""
     var valueOfMax = -1.0
     for (i in res) {
-        val now = i.split(" ").toMutableList().filter { it != "" && it != " " }
+        val now = i.split(" ").toList().filter { it != "" && it != " " }
         if (now.size < 2) return nameOfMax
         try {
             if (now[1].toDouble() > valueOfMax) {
@@ -330,7 +320,7 @@ fun mostExpensive(description: String): String {
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int {
+fun fromRoman(roman: String): Int = TODO() /*{
     for (i in roman) if (i !in "IXVLCDM") return -1
     val ed = listOf("I", "II", "III", "IV", " ", "VI", "VII", "VIII", "IX").reversed()
     val des = listOf("X", "XX", "XXX", "XL", " ", "LX", "LXX", "LXXX", "XC").reversed()
@@ -370,7 +360,7 @@ fun fromRoman(roman: String): Int {
     }
     if (res == 0) return -1
     return res
-}
+}*/
 
 /**
  * Очень сложная (7 баллов)
@@ -411,16 +401,16 @@ fun fromRoman(roman: String): Int {
 // Find place of ]
 fun getOut(st: String, now: Int): Int {
     var res = -1
-    val stack: MutableList<Char> = mutableListOf()
+    var stack = 0
 
     for (i in st.indices) {
         if (st[i] == '[') {
-            stack += '['
-            if (i == now) res = stack.size
+            stack += 1
+            if (i == now) res = stack
         }
         if (st[i] == ']') {
-            if (stack.size == res) return i
-            stack -= '['
+            if (stack == res) return i
+            stack -= 1
         }
     }
     return res
@@ -429,8 +419,8 @@ fun getOut(st: String, now: Int): Int {
 // Find place of [
 fun getIn(st: String, now: Int): Int {
     val res = -1
-    val stack: MutableList<Char> = mutableListOf()
-    val places: MutableList<Int> = mutableListOf()
+    val stack = mutableListOf<Char>()
+    val places = mutableListOf<Int>()
     var place = 0
     for (i in st.indices) {
         if (st[i] == '[') {
@@ -449,8 +439,7 @@ fun getIn(st: String, now: Int): Int {
 }
 
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    val res: MutableList<Int> = mutableListOf()
-    for (i in 1..cells) res.add(0)
+    val res = MutableList<Int>(cells) { 0 }
     // Check symbols
     val possibleSymbols = "><+-[] "
     for (j in commands) {

@@ -346,6 +346,16 @@ fun hasSame(matrix: Matrix<Int>, matrix1: Matrix<Int>): Boolean {
     }
     return true
 }
+fun betterChoice(initial: Matrix<Int>, end: Matrix<Int>): Int {
+    var same = 0
+    for (i in 0..3) {
+        for (j in 0..3) {
+            if (end.get(i, j) == 0 || initial.get(i, j) == 0) continue
+            same += abs(getByValue(end, initial.get(i, j)).row - i) + abs(getByValue(end, initial.get(i, j)).column - j)
+        }
+    }
+    return same
+}
 
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     val pos1 = createMatrix(4, 4, 0)
@@ -361,27 +371,35 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     pos1.set(3, 3, 0); pos2.set(3, 3, 0)
     pos2.set(3, 2, 14); pos2.set(3, 1, 15)
     println(matrix)
-    var memorize = mutableMapOf<MutableList<Int>, Matrix<Int>>()
-    memorize.put(mutableListOf(), clone(matrix))
+    var memorize = mutableMapOf<Int, MutableMap<MutableList<Int>, Matrix<Int>>>()
+    memorize.put(min(betterChoice(matrix, pos1), betterChoice(matrix, pos2)), mutableMapOf())
+    memorize.getValue(min(betterChoice(matrix, pos1), betterChoice(matrix, pos2))).put(mutableListOf(), clone(matrix))
     if (hasSame(matrix, pos1) || hasSame(matrix, pos2)) return listOf()
     var al = mutableSetOf(mutableListOf<Int>())
     while (true) {
-        val new1 = mutableMapOf<MutableList<Int>, Matrix<Int>>()
-        for (i in memorize) {
-            for (j in getPossibleMove(getByValue(i.value, 0))) {
-                if (i.key.size > 0 && i.key[i.key.size - 1] == i.value.get(j)) continue
-                val new = clone(i.value)
-                val toAdd = new.get(j)
-                new.set(getByValue(new, 0), toAdd)
-                new.set(j, 0)
-                val newMoves = cloneList(i.key)
-                newMoves.add(toAdd)
-                //println(newMoves)
-                if (hasSame(new, pos1) || hasSame(new, pos2)) return newMoves
-                new1.put(newMoves, new)
+        val new1 = mutableMapOf<Int, MutableMap<MutableList<Int>, Matrix<Int>>>()
+        for (i in memorize.keys.sorted()) {
+            for (k in memorize.getValue(i)) {
+                for (j in getPossibleMove(getByValue(k.value, 0))) {
+                    if (new1.size >= 5) break
+                    if (k.key.size > 0 && k.key[k.key.size - 1] == k.value.get(j)) continue
+                    val new = clone(k.value)
+                    val toAdd = new.get(j)
+                    new.set(getByValue(new, 0), toAdd)
+                    new.set(j, 0)
+                    val newMoves = cloneList(k.key)
+                    newMoves.add(toAdd)
+                    //println(newMoves.size)
+                    if (hasSame(new, pos1) || hasSame(new, pos2)) return newMoves
+                    val now = min(betterChoice(new, pos1), betterChoice(new, pos2))
+                    if (new1.containsKey(now)) {
+                        new1.getValue(now).put(newMoves, new)
+                    } else {
+                        new1.put(now, mutableMapOf(newMoves to new))
+                    }
+                }
             }
         }
-        memorize.clear()
-        for (i in new1) if (i.key.size <= 80) memorize.put(i.key, i.value)
+        memorize = new1
     }
 }

@@ -49,4 +49,5 @@ class OpenHashSet<T>(val capacity: Int) {
      * и любой элемент из второй таблицы входит также и в первую
      */
     override fun equals(other: Any?): Boolean = TODO()
+
 }

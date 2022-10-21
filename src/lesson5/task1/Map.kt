@@ -4,6 +4,7 @@ package lesson5.task1
 
 
 import kotlin.math.*
+import lesson9.task1.MutablePair
 
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
@@ -203,7 +204,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
             res.getValue(a)[1] += 1.0
         }
     }
-    val res1: MutableMap<String, Double> = mutableMapOf()
+    val res1 = mutableMapOf<String, Double>()
     for (i in res) {
         res1.put(i.key, i.value[0] / i.value[1])
     }
@@ -253,12 +254,11 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     // Множество букв слова в нижнем регистре
-    val mas = word.toCharArray().map { it.lowercaseChar() }.toMutableSet()
+    val mas = word.map { it.lowercaseChar() }.toMutableSet()
     // Множество данных букв
     // Из них можно составить слово если mas2 содержит mas
     val mas2 = chars.map { it.lowercaseChar() }.toMutableSet()
-    if (mas2.containsAll(mas)) return true
-    return false
+    return mas2.containsAll(mas)
 }
 
 /**
@@ -298,21 +298,10 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  */
 
 fun hasAnagrams(words: List<String>): Boolean {
-    // Обход списка один, но есть обход в маппе, до лучшего решения не дошёл
-    var dp = mutableMapOf<Int, MutableList<MutableMap<Char, Int>>>() // Размеру слов соответствует набор мап с количеством элементов
-    for (i in words) {
-        val letters = mutableMapOf<Char, Int>()
-        for (j in i) {
-            if (letters.keys.contains(j)) letters[j]?.plus(1)
-            else letters.put(j, 1)
-        }
-        if (dp.keys.contains(i.length)) {
-            for (j in dp.getValue(i.length)) if (j == letters) return true
-            dp[i.length]?.plus(letters)
-        } else {
-            dp.put(i.length, mutableListOf(letters))
-        }
-    }
+    // Можно сортировать строки и кидать их в сет, если размер сет уменьшится, тоесть хотя бы одна анаграмма есть
+    var new = mutableSetOf<String>()
+    for (i in words) new.add(i.toCharArray().sorted().joinToString(""))
+    if (words.size - new.size != 0) return true
     return false
 }
 
@@ -409,10 +398,10 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val bufer = mutableMapOf<Int, MutableList<Int>>()
     for (i in list.indices) {
         if (list[i] > number / 2) {
-            if (number - list[i] !in bufer.keys) bufer.put(number - list[i], mutableListOf(-1, -1))
+            if (number - list[i] !in bufer) bufer.put(number - list[i], mutableListOf(-1, -1))
             bufer.getValue(number - list[i]).set(1, i)
         } else {
-            if (list[i] !in bufer.keys) bufer.put(list[i], mutableListOf(-1, -1))
+            if (list[i] !in bufer) bufer.put(list[i], mutableListOf(-1, -1))
             // Обработка случая когда слагаемые равны
             if (bufer.getValue(list[i])[0] != -1 && list[i] + list[bufer.getValue(list[i])[0]] == number)
                 return (minOf(bufer.getValue(list[i])[0], i) to maxOf(bufer.getValue(list[i])[0], i))
