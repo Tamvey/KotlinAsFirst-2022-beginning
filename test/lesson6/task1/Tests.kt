@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-class Tests {
+    class Tests {
     @Test
     @Tag("Example")
     fun timeStrToSeconds() {
@@ -71,7 +71,7 @@ class Tests {
     @Test
     @Tag("5")
     fun bestLongJump() {
-        assertEquals(   717, bestLongJump("706 % - 717 - 703"))
+        assertEquals(717, bestLongJump("706 % - 717 - 703"))
         assertEquals(-1, bestLongJump("% - - % -"))
         assertEquals(754, bestLongJump("700 717 707 % 754"))
         assertEquals(-1, bestLongJump("700 + 700"))
@@ -81,7 +81,6 @@ class Tests {
     @Test
     @Tag("6")
     fun bestHighJump() {
-        assertEquals(226, bestHighJump("226 %+"))
         assertEquals(226, bestHighJump("226 +"))
         assertEquals(-1, bestHighJump("???"))
         assertEquals(230, bestHighJump("220 + 224 %+ 228 %- 230 + 232 %%- 234 %"))

@@ -92,8 +92,8 @@ fun dateStrToDigit(str: String): String {
         }
         if (daysInMonth(months.indexOf(res[1]) + 1, res2ToInt) < res0ToInt) return ans
         ans += twoDigitStr(res[0].toInt()) + "."
-        if ((months.indexOf(res[1]) + 1).toString().length == 1) ans += "0" + (months.indexOf(res[1]) + 1).toString()
-        else ans += (months.indexOf(res[1]) + 1).toString()
+        if ((months.indexOf(res[1]) + 1).toString().length == 1) ans += twoDigitStr(months.indexOf(res[1]) + 1)
+        else ans += twoDigitStr(months.indexOf(res[1]) + 1)
         ans += "." + res[2]
     } catch (e: Exception) {
         return ans
@@ -186,13 +186,12 @@ fun bestLongJump(jumps: String): Int {
     var bufer = jumps.toString()
     bufer = Regex("""[%-]""").replace(bufer, "")
     if (Regex("""[^0-9 ]""").find(bufer) != null) return -1
-    var res = 0
+    var res = -1
     for (i in bufer.split(" ")) {
         if (i == "") continue
         if (res == 0) res = i.toInt()
         res = maxOf(i.toInt(), res)
     }
-    if (res == 0) return -1
     return res
 }
 
@@ -419,19 +418,19 @@ fun getOut(st: String, now: Int): Int {
 // Find place of [
 fun getIn(st: String, now: Int): Int {
     val res = -1
-    val stack = mutableListOf<Char>()
+    var stack = 0
     val places = mutableListOf<Int>()
     var place = 0
     for (i in st.indices) {
         if (st[i] == '[') {
-            stack += '['
+            stack += 1
             places += i
         }
         if (st[i] == ']') {
             if (i == now) {
                 return places[places.size - 1]
             }
-            stack -= '['
+            stack -= 1
             places.removeAt(places.size - 1)
         }
     }
@@ -446,7 +445,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
         if (j !in possibleSymbols) throw IllegalArgumentException()
     }
     // Check if '[' and ']' situated correctly
-    val stack: MutableList<Char> = mutableListOf()
+    val stack = mutableListOf<Char>()
     for (i in commands) {
         if (i == '[') stack += '['
         if (i == ']') {

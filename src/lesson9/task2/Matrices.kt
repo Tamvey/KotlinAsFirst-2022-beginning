@@ -251,6 +251,7 @@ fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
             try {
                 if (matrix.get(i, j) == value) return Cell(i, j)
             } catch (e: Exception) {
+                continue
             }
         }
     }
@@ -332,20 +333,13 @@ fun clone(matrix: Matrix<Int>): Matrix<Int> {
     }
     return res
 }
+
 fun cloneList(f: List<Int>): MutableList<Int> {
     val newList = mutableListOf<Int>()
     for (i in f) newList += i
     return newList
 }
 
-fun hasSame(matrix: Matrix<Int>, matrix1: Matrix<Int>): Boolean {
-    for (i in 0..3) {
-        for (j in 0..3) {
-            if (matrix.get(i, j) != matrix1.get(i, j)) return false
-        }
-    }
-    return true
-}
 fun betterChoice(initial: Matrix<Int>, end: Matrix<Int>): Int {
     var same = 0
     for (i in 0..3) {
@@ -357,49 +351,72 @@ fun betterChoice(initial: Matrix<Int>, end: Matrix<Int>): Int {
     return same
 }
 
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
-    val pos1 = createMatrix(4, 4, 0)
-    val pos2 = createMatrix(4, 4, 0)
-    var vall = 1
+var idealCase1 = createMatrix(4, 4, 0);
+var idealCase2 = createMatrix(4, 4, 0);
+
+fun defineIdealCases(m: Matrix<Int>, type: Int) {
+    var now = 1
     for (i in 0..3) {
         for (j in 0..3) {
-            pos1.set(i, j, vall)
-            pos2.set(i, j, vall)
-            vall++
+            m.set(i, j, now)
+            now++
         }
     }
-    pos1.set(3, 3, 0); pos2.set(3, 3, 0)
-    pos2.set(3, 2, 14); pos2.set(3, 1, 15)
-    println(matrix)
-    var memorize = mutableMapOf<Int, MutableMap<MutableList<Int>, Matrix<Int>>>()
-    memorize.put(min(betterChoice(matrix, pos1), betterChoice(matrix, pos2)), mutableMapOf())
-    memorize.getValue(min(betterChoice(matrix, pos1), betterChoice(matrix, pos2))).put(mutableListOf(), clone(matrix))
-    if (hasSame(matrix, pos1) || hasSame(matrix, pos2)) return listOf()
-    var al = mutableSetOf(mutableListOf<Int>())
+    m.set(3, 3, 0)
+    if (type == 2) {
+        m.set(3, 1, 15)
+        m.set(3, 2, 14)
+    }
+}
+
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    // Определение решенных позиций
+    defineIdealCases(idealCase1, 1); defineIdealCases(idealCase2, 2)
+    if (betterChoice(matrix, idealCase1) == 0 || betterChoice(matrix, idealCase2) == 0) {
+        return listOf()
+    }
+    //println(matrix)
+    var memorize = mutableMapOf<Int, MutableList<MutableList<Int>>>()
+    for (j in getPossibleMove(getByValue(matrix, 0))) {
+        var number = matrix.get(j)
+        matrix.set(getByValue(matrix, 0), number)
+        matrix.set(j, 0)
+        var vall1 = minOf(betterChoice(idealCase2, matrix), betterChoice(idealCase1, matrix))
+        memorize[vall1] = mutableListOf(mutableListOf(number))
+        matrix.set(getByValue(matrix, number), 0)
+        matrix.set(j, number)
+    }
     while (true) {
-        val new1 = mutableMapOf<Int, MutableMap<MutableList<Int>, Matrix<Int>>>()
-        for (i in memorize.keys.sorted()) {
-            for (k in memorize.getValue(i)) {
-                for (j in getPossibleMove(getByValue(k.value, 0))) {
-                    if (new1.size >= 5) break
-                    if (k.key.size > 0 && k.key[k.key.size - 1] == k.value.get(j)) continue
-                    val new = clone(k.value)
-                    val toAdd = new.get(j)
-                    new.set(getByValue(new, 0), toAdd)
-                    new.set(j, 0)
-                    val newMoves = cloneList(k.key)
-                    newMoves.add(toAdd)
-                    //println(newMoves.size)
-                    if (hasSame(new, pos1) || hasSame(new, pos2)) return newMoves
-                    val now = min(betterChoice(new, pos1), betterChoice(new, pos2))
-                    if (new1.containsKey(now)) {
-                        new1.getValue(now).put(newMoves, new)
-                    } else {
-                        new1.put(now, mutableMapOf(newMoves to new))
-                    }
-                }
+        var stopper = 0
+        var now = mutableMapOf<Int, MutableList<MutableList<Int>>>()
+        var sortedKeys = memorize.keys.sorted()
+        println(sortedKeys[0])
+        for (i in sortedKeys) {
+            if (stopper == 5) {
+                stopper = 0
+                break
             }
+            var stopper2 = 0
+            for (k in memorize.getValue(i)) {
+                if (stopper2 == 5) break
+                var nowList = cloneList(k)
+                var bufer = fifteenGameMoves(matrix, nowList.toList())
+                for (j in getPossibleMove(getByValue(bufer, 0))) {
+                    if (nowList.size > 0 && bufer.get(j) == nowList[nowList.size - 1]) continue
+                    var localBufer = clone(bufer)
+                    var localList = cloneList(nowList); localList.add(bufer.get(j))
+                    localBufer.set(getByValue(localBufer, 0), localBufer.get(j))
+                    localBufer.set(j, 0)
+                    var res1 = minOf(betterChoice(idealCase2, localBufer), betterChoice(idealCase1, localBufer))
+                    if (res1 == 0) return localList
+                    if (now.containsKey(res1)) now.getValue(res1).add(localList)
+                    else now.put(res1, mutableListOf(localList))
+                    //println(nowList)
+                }
+                stopper2++
+            }
+            stopper++
         }
-        memorize = new1
+        memorize = now
     }
 }

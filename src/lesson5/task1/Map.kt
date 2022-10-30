@@ -299,10 +299,9 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
 
 fun hasAnagrams(words: List<String>): Boolean {
     // Можно сортировать строки и кидать их в сет, если размер сет уменьшится, тоесть хотя бы одна анаграмма есть
-    var new = mutableSetOf<String>()
+    val new = mutableSetOf<String>()
     for (i in words) new.add(i.toCharArray().sorted().joinToString(""))
-    if (words.size - new.size != 0) return true
-    return false
+    return (words.size - new.size != 0)
 }
 
 /**
@@ -393,22 +392,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    // Будем хранить в мапе в качестве ключей 0..n/2 - слагаемые
-    // в качестве значений - расположение первого слагаемого (0..n/2) и второго ( (n+1)//2 .. n-1)
-    val bufer = mutableMapOf<Int, MutableList<Int>>()
+    val bufer = mutableMapOf<Int, Int>()
     for (i in list.indices) {
-        if (list[i] > number / 2) {
-            if (number - list[i] !in bufer) bufer.put(number - list[i], mutableListOf(-1, -1))
-            bufer.getValue(number - list[i]).set(1, i)
+        if (bufer.containsKey(number - list[i])) {
+            return (bufer.getValue(number - list[i]) to i)
         } else {
-            if (list[i] !in bufer) bufer.put(list[i], mutableListOf(-1, -1))
-            // Обработка случая когда слагаемые равны
-            if (bufer.getValue(list[i])[0] != -1 && list[i] + list[bufer.getValue(list[i])[0]] == number)
-                return (minOf(bufer.getValue(list[i])[0], i) to maxOf(bufer.getValue(list[i])[0], i))
-            else bufer.getValue(list[i]).set(0, i)
+            bufer.put(list[i], i)
         }
     }
-    for (i in bufer.values) if (i[0] >= 0 && i[1] >= 0) return (minOf(i[0], i[1]) to maxOf(i[0], i[1]))
     return (-1 to -1)
 }
 
