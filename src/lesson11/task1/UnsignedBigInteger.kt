@@ -1,5 +1,6 @@
 package lesson11.task1
 
+import java.lang.ArithmeticException
 import java.lang.StringBuilder
 /**
  * Класс "беззнаковое большое целое число".
@@ -51,7 +52,10 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Вычитание (бросить ArithmeticException, если this < other)
      */
-    operator fun minus(other: UnsignedBigInteger): UnsignedBigInteger = TODO()
+    operator fun minus(other: UnsignedBigInteger): UnsignedBigInteger = TODO()/*{
+        if (this.compareTo(other) == -1) throw ArithmeticException()
+
+    }*/
 
     /**
      * Умножение
@@ -84,7 +88,15 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Сравнение на больше/меньше (по контракту Comparable.compareTo)
      */
-    override fun compareTo(other: UnsignedBigInteger): Int = TODO()
+    override fun compareTo(other: UnsignedBigInteger): Int {
+        if (this.nums.size > other.nums.size) return 1
+        if (this.nums.size < other.nums.size) return -1
+        for (i in other.nums.size - 1 downTo 0) {
+            if (this.nums[i] > other.nums[i]) return 1
+            if (this.nums[i] < other.nums[i]) return -1
+        }
+        return 0
+    }
 
     /**
      * Преобразование в строку

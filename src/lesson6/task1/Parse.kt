@@ -3,6 +3,7 @@
 package lesson6.task1
 
 import lesson2.task2.daysInMonth
+import lesson7.task1.count
 import java.lang.IndexOutOfBoundsException
 import java.lang.StringBuilder
 
@@ -151,7 +152,7 @@ fun countSymbols(n: String, c: Char): Int {
 
 fun flattenPhoneNumber(phone: String): String {
     var new = phone
-    if (new.matches(Regex("""[\+0-9\(][0-9\(\) \-]+""")) && !(new.contains(Regex("""\(\)""")))) {
+    if (new.matches(Regex("""\+[0-9\(\) \-]+||[0-9\(\) \-]+""")) && !(new.contains(Regex("""\(\)""")))) {
         new = Regex("""[\(\)\- ]""").replace(new, "")
         return new
     } else return ""
