@@ -79,6 +79,7 @@ fun main() {
  * входными данными.
  */
 fun dateStrToDigit(str: String): String {
+    if (!str.matches(Regex("""[0-9]+.[а-я]+.[0-9]+"""))) return ""
     val res = str.split(" ").toMutableList()
     val months = listOf(
         "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -86,12 +87,8 @@ fun dateStrToDigit(str: String): String {
     )
     var ans = ""
     val res0ToInt = res[0].toInt()
-    val res2ToInt: Int
-    try {
-        res2ToInt = res[2].toInt()
-    } catch (e: IndexOutOfBoundsException) {
-        return ans
-    }
+    val res2ToInt = res[2].toInt()
+
     if (res[1] !in months || res0ToInt !in 1..31 || res.size > 3) {
         return ans
     }
@@ -114,22 +111,19 @@ fun dateStrToDigit(str: String): String {
  * входными данными.
  */
 fun dateDigitToStr(digital: String): String {
+    if (!digital.matches(Regex("""[0-9]+.[0-9]+.[0-9]+"""))) return ""
     var ans = ""
     val res = digital.split(".")
     val months = listOf(
         "января", "февраля", "марта", "апреля", "мая", "июня",
         "июля", "августа", "сентября", "октября", "ноября", "декабря"
     )
-    try {
-        if (res[1].toInt() !in 1..12 || res[0].toInt() !in 1..31 || res.size > 3) {
-            return ans
-        }
-        if (daysInMonth(res[1].toInt(), res[2].toInt()) < res[0].toInt()) return ans
-        ans = "${res[0].toInt()} ${months[res[1].toInt() - 1]} ${res[2].toInt()}"
-    } catch (e: Exception) {
+
+    if (res[1].toInt() !in 1..12 || res[0].toInt() !in 1..31 || res.size > 3) {
         return ans
     }
-
+    if (daysInMonth(res[1].toInt(), res[2].toInt()) < res[0].toInt()) return ans
+    ans = "${res[0].toInt()} ${months[res[1].toInt() - 1]} ${res[2].toInt()}"
     return ans
 }
 
@@ -217,7 +211,8 @@ fun bestHighJump(jumps: String): Int {
  */
 fun plusMinus(expression: String): Int {
     if (expression.contains(Regex("""[0-9][ ]+[0-9]+""")) || expression.contains(Regex("""[\+\-][ ]+[\+\-]"""))
-        || expression.contains(Regex("""[^0-9\+\- ]""")) || expression[0] in "+-") throw IllegalArgumentException()
+        || expression.contains(Regex("""[^0-9\+\- ]""")) || expression[0] in "+-" || expression.isEmpty()
+    ) throw IllegalArgumentException()
     val res = expression.split(" ")
     var ans = res[0].toInt()
     for (i in 2..res.size - 1 step 2) {

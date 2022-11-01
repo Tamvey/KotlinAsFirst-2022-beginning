@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-    class Tests {
+class Tests {
     @Test
     @Tag("Example")
     fun timeStrToSeconds() {
