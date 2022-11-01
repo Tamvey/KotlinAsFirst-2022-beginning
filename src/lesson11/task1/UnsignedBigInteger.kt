@@ -1,5 +1,6 @@
 package lesson11.task1
 
+import java.lang.StringBuilder
 /**
  * Класс "беззнаковое большое целое число".
  *
@@ -16,21 +17,36 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Конструктор из строки
      */
+    var nums: List<Int>
+
     constructor(s: String) {
-        TODO()
+        nums = s.toMutableList().map { it.toString().toInt() }
     }
 
     /**
      * Конструктор из целого
      */
     constructor(i: Int) {
-        TODO()
+        nums = i.toString().toMutableList().map { it.toString().toInt() }
     }
 
     /**
      * Сложение
      */
-    operator fun plus(other: UnsignedBigInteger): UnsignedBigInteger = TODO()
+    operator fun plus(other: UnsignedBigInteger): UnsignedBigInteger {
+        var new = mutableListOf<Int>()
+        var add = 0
+        for (i in 0..maxOf(nums.size - 1, other.nums.size - 1)) {
+            var nowSum = add
+            if (i < nums.size) nowSum += nums[nums.size - 1 - i]
+            if (i < other.nums.size) nowSum += other.nums[other.nums.size - 1 - i]
+            new.add(nowSum % 10)
+            add = nowSum / 10
+        }
+        if (add != 0) new.add(add)
+        var st = ""; for (i in new.reversed()) st += i.toString()
+        return UnsignedBigInteger(st)
+    }
 
     /**
      * Вычитание (бросить ArithmeticException, если this < other)
@@ -55,7 +71,15 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Сравнение на равенство (по контракту Any.equals)
      */
-    override fun equals(other: Any?): Boolean = TODO()
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is UnsignedBigInteger) return false
+        if (this.nums.size != other.nums.size) return false
+        for (i in 0 until this.nums.size) {
+            if (this.nums[i] != other.nums[i]) return false
+        }
+        return true
+    }
 
     /**
      * Сравнение на больше/меньше (по контракту Comparable.compareTo)
