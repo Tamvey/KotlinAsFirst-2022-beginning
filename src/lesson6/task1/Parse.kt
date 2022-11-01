@@ -3,6 +3,7 @@
 package lesson6.task1
 
 import lesson2.task2.daysInMonth
+import java.lang.IndexOutOfBoundsException
 import java.lang.StringBuilder
 
 // Урок 6: разбор строк, исключения
@@ -84,20 +85,21 @@ fun dateStrToDigit(str: String): String {
         "июля", "августа", "сентября", "октября", "ноября", "декабря"
     )
     var ans = ""
+    val res0ToInt = res[0].toInt()
+    val res2ToInt: Int
     try {
-        val res0ToInt = res[0].toInt()
-        val res2ToInt = res[2].toInt()
-        if (res[1] !in months || res0ToInt !in 1..31 || res.size > 3) {
-            return ans
-        }
-        if (daysInMonth(months.indexOf(res[1]) + 1, res2ToInt) < res0ToInt) return ans
-        ans += twoDigitStr(res[0].toInt()) + "."
-        if ((months.indexOf(res[1]) + 1).toString().length == 1) ans += twoDigitStr(months.indexOf(res[1]) + 1)
-        else ans += twoDigitStr(months.indexOf(res[1]) + 1)
-        ans += "." + res[2]
-    } catch (e: Exception) {
+        res2ToInt = res[2].toInt()
+    } catch (e: IndexOutOfBoundsException) {
         return ans
     }
+    if (res[1] !in months || res0ToInt !in 1..31 || res.size > 3) {
+        return ans
+    }
+    if (daysInMonth(months.indexOf(res[1]) + 1, res2ToInt) < res0ToInt) return ans
+    ans += twoDigitStr(res[0].toInt()) + "."
+    ans += twoDigitStr(months.indexOf(res[1]) + 1)
+    ans += "." + res[2]
+
     return ans
 }
 
@@ -154,22 +156,11 @@ fun countSymbols(n: String, c: Char): Int {
 }
 
 fun flattenPhoneNumber(phone: String): String {
-    if (Regex("""[^0123456789+() -]""").find(phone) != null) return ""
-    if ("()" in phone) return ""
-    var res = buildString {
-        for (i in phone) {
-            if (i in "01234567890+") append(i)
-        }
-    }
-    if (countSymbols(res, '+') >= 1 && res[0] != '+') return ""
-    // Counting of '(' and ')'
-    var c = 0
-    for (i in phone) {
-        if (i == '(') c++
-        if (i == ')') c--
-    }
-    if (c != 0) return ""
-    return res
+    var new = phone
+    if (new.matches(Regex("""[\+0-9\(][0-9\(\) \-]+""")) && !(new.contains(Regex("""\(\)""")))) {
+        new = Regex("""[\(\)\- ]""").replace(new, "")
+        return new
+    } else return ""
 }
 
 /**
@@ -207,17 +198,12 @@ fun bestLongJump(jumps: String): Int {
  * вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    if (Regex("""[^0-9\+%\- ]""").find(jumps) != null) return -1
-    if (Regex("""\+""").find(jumps) == null || Regex("""[0-9]""").find(jumps) == null) return -1
-    var maxx = 0
-    val mas = jumps.split(" ")
-    for (i in mas.indices) {
-        if (i + 1 < mas.size && mas[i + 1].contains("+") && mas[i].any { it.isDigit() }) {
-            maxx = maxOf(maxx, mas[i].toInt())
-        }
+    var ans = -1
+    if (!jumps.matches(Regex("""[\+\-\%0-9 ]+"""))) return ans
+    for (i in Regex("""[0-9]+ \+""").findAll(jumps, 0).map { it.value }.toList()) {
+        ans = maxOf(ans, i.split(" ")[0].toInt())
     }
-    if (maxx == 0) return -1
-    return maxx
+    return ans
 }
 
 /**
@@ -230,21 +216,10 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
+    if (expression.contains(Regex("""[0-9][ ]+[0-9]+""")) || expression.contains(Regex("""[\+\-][ ]+[\+\-]"""))
+        || expression.contains(Regex("""[^0-9\+\- ]""")) || expression[0] in "+-") throw IllegalArgumentException()
     val res = expression.split(" ")
-    var ans = 0
-    // Проверка на верность чередования чисел и арифмет. действий
-    for (i in 1..res.size - 1) {
-        if (("+" in res[i] || "-" in res[i]) && ("+" in res[i - 1] || "-" in res[i - 1])) throw IllegalArgumentException()
-        if (!("+" in res[i] || "-" in res[i]) && !("+" in res[i - 1] || "-" in res[i - 1])) throw IllegalArgumentException()
-    }
-    // Проверка на наличие допустимых знаков
-    for (j in res) {
-        if (Regex("""[^0-9\+\-]""").find(j) != null) throw IllegalArgumentException()
-    }
-    // Если первый или второй элемент в res - арифметю опер.
-    if (("+" in res[0] || "-" in res[0]) || ("+" in res[res.size - 1] || "-" in res[res.size - 1])) throw IllegalArgumentException()
-    // Вычисления 8
-    ans = res[0].toInt()
+    var ans = res[0].toInt()
     for (i in 2..res.size - 1 step 2) {
         if (res[i - 1] == "+") ans += res[i].toInt()
         if (res[i - 1] == "-") ans -= res[i].toInt()
@@ -289,12 +264,11 @@ fun firstDuplicateIndex(str: String): Int {
  * Все цены должны быть больше нуля либо равны нулю.
  */
 fun mostExpensive(description: String): String {
-    val res: List<String>
-    res = description.split(";")
+    val res = description.split(";")
     var nameOfMax = ""
     var valueOfMax = -1.0
     for (i in res) {
-        val now = i.split(" ").toList().filter { it != "" && it != " " }
+        val now = i.split(" ").filter { it != "" && it != " " }
         if (now.size < 2) return nameOfMax
         try {
             if (now[1].toDouble() > valueOfMax) {
@@ -417,10 +391,8 @@ fun getOut(st: String, now: Int): Int {
 
 // Find place of [
 fun getIn(st: String, now: Int): Int {
-    val res = -1
     var stack = 0
-    val places = mutableListOf<Int>()
-    var place = 0
+    var places = mutableListOf<Int>()
     for (i in st.indices) {
         if (st[i] == '[') {
             stack += 1
@@ -434,7 +406,7 @@ fun getIn(st: String, now: Int): Int {
             places.removeAt(places.size - 1)
         }
     }
-    return res
+    return -1
 }
 
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
