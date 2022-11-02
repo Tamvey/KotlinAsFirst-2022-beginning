@@ -24,7 +24,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     var nums: MutableList<Int>
 
     constructor(s: String) {
-        if (!s.matches(Regex("""[0-9]+"""))) nums = mutableListOf(0)
+        if (!s.matches(Regex("""[0-9]+"""))) nums = mutableListOf(1)
         else nums = s.toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
@@ -32,7 +32,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Конструктор из целого
      */
     constructor(i: Int) {
-        if (!i.toString().matches(Regex("""[0-9]+"""))) nums = mutableListOf(0)
+        if (!i.toString().matches(Regex("""[0-9]+"""))) nums = mutableListOf(1)
         else nums = i.toString().toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
