@@ -86,27 +86,27 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                 var got = other.nums[other.nums.size - 1 - j] * this.nums[this.nums.size - 1 - i]
                 if (i + j >= new.size) new.add(0)
                 new[i + j] += got % 10
-                if (new[i + j] / 10 > 0) {
-                    if (i + j + 1 >= new.size) new.add(0)
-                    new[i + j + 1] += new[i + j] / 10
-                    new[i + j] = new[i + j] % 10
-                }
-                if (got / 10 > 0) {
+                if (got / 10 != 0) {
                     if (i + j + 1 >= new.size) new.add(0)
                     new[i + j + 1] += got / 10
-                    if (new[i + j + 1] / 10 > 0) {
-                        if (i + j + 2 >= new.size) new.add(0)
-                        new[i + j + 2] += new[i + j + 1] / 10
-                        new[i + j + 1] = new[i + j + 1] % 10
-                    }
-
                 }
             }
         }
+        for (i in 0 until new.size - 1) {
+            if (new[i] / 10 > 0) {
+                new[i + 1] += new[i] / 10
+                new[i] = new[i] % 10
+            }
+        }
+        var last = new[new.size - 1].toString()
+        new[new.size - 1] = new[new.size - 1] % 10
+        for (j in 1 until last.length) {
+            new.add(last[j].toString().toInt())
+        }
         var st = ""; for (i in new.reversed()) st += i.toString()
+        println(st)
         return UnsignedBigInteger(st)
     }
-
 
     /**
      * Деление
