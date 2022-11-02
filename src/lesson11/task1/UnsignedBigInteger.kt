@@ -31,7 +31,8 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Конструктор из целого
      */
     constructor(i: Int) {
-        nums = Regex("""[^0-9]""").replace(i.toString(), "").toMutableList().map { it.toString().toInt() }.toMutableList()
+        nums =
+            Regex("""[^0-9]""").replace(i.toString(), "").toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
     /**
@@ -112,29 +113,37 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Деление
      */
-    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger = TODO () /*{
+    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger {
         var pointer = 0
-        var res = "0"
-        var now = ""
+        var toDivide = ""
+        var res = ""
         while (pointer < this.nums.size) {
-            while (UnsignedBigInteger(now).compareTo(other) == -1 || pointer < this.nums.size) {
-                now += this.nums[pointer].toString()
-                pointer += 1
+            while ((toDivide.isEmpty() || UnsignedBigInteger(toDivide).compareTo(other) == -1) && pointer < this.nums.size) {
+                if (toDivide.isEmpty() && this.nums[pointer] == 0) {
+                    res += "0"
+                } else toDivide += this.nums[pointer].toString()
+                pointer++
             }
-            if (UnsignedBigInteger(now).compareTo(other) == -1) return UnsignedBigInteger(res)
-            var number = UnsignedBigInteger("0")
-            while (number.times(other).compareTo(UnsignedBigInteger(now)) < 1) number.plus(UnsignedBigInteger("1"))
-            number = number.minus(UnsignedBigInteger("1"))
-            res += number.nums.toString()
-            now = this.minus(number.times(other)).toString()
+            if (toDivide.isEmpty() || UnsignedBigInteger(toDivide).compareTo(other) == -1) return UnsignedBigInteger(res)
+            var number = UnsignedBigInteger(0)
+            while (number.times(other).compareTo(UnsignedBigInteger(toDivide)) != 1) number = number.plus(UnsignedBigInteger(1))
+            number = number.minus(UnsignedBigInteger(1))
+            res += number.toString().removePrefix("0")
+            toDivide = UnsignedBigInteger(toDivide).minus(other.times(number)).toString()
+            toDivide = toDivide.removePrefix("0")
         }
-        return UnsignedBigInteger(res.removePrefix("0"))
-    }*/
+        return UnsignedBigInteger(res)
+    }
 
     /**
      * Взятие остатка
      */
-    operator fun rem(other: UnsignedBigInteger): UnsignedBigInteger = TODO()
+    operator fun rem(other: UnsignedBigInteger) : UnsignedBigInteger {
+        var res = this.minus(this.div(other).times(other)).toString()
+        if (res.length == 1 && res[0] == '0') return UnsignedBigInteger(res)
+        return UnsignedBigInteger(res.removePrefix("0"))
+    }
+
 
     /**
      * Сравнение на равенство (по контракту Any.equals)
@@ -155,7 +164,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     override fun compareTo(other: UnsignedBigInteger): Int {
         if (this.nums.size > other.nums.size) return 1
         if (this.nums.size < other.nums.size) return -1
-        for (i in other.nums.size - 1 downTo 0) {
+        for (i in 0 until other.nums.size) {
             if (this.nums[i] > other.nums[i]) return 1
             if (this.nums[i] < other.nums[i]) return -1
         }
