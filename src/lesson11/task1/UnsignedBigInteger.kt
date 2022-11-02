@@ -24,16 +24,14 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     var nums: MutableList<Int>
 
     constructor(s: String) {
-        if (!s.matches(Regex("""[0-9]+"""))) nums = mutableListOf(1)
-        else nums = s.toMutableList().map { it.toString().toInt() }.toMutableList()
+        nums = Regex("""[^0-9]""").replace(s, "").toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
     /**
      * Конструктор из целого
      */
     constructor(i: Int) {
-        if (!i.toString().matches(Regex("""[0-9]+"""))) nums = mutableListOf(1)
-        else nums = i.toString().toMutableList().map { it.toString().toInt() }.toMutableList()
+        nums = Regex("""[^0-9]""").replace(i.toString(), "").toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
     /**
@@ -107,20 +105,30 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
             new.add(last[j].toString().toInt())
         }
         var st = ""; for (i in new.reversed()) st += i.toString()
-        while (st[0] == '0') st = st.removePrefix("0")
+        st = st.removePrefix("0")
         return UnsignedBigInteger(st)
     }
 
     /**
      * Деление
      */
-    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger = TODO() /*{
-        var bufer = UnsignedBigInteger("1")
-        while (other.times(bufer).compareTo(this) < 1) {
-            bufer = bufer.plus(UnsignedBigInteger("1"))
-            if (bufer.nums.size > 9) println(bufer.nums)
+    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger = TODO () /*{
+        var pointer = 0
+        var res = "0"
+        var now = ""
+        while (pointer < this.nums.size) {
+            while (UnsignedBigInteger(now).compareTo(other) == -1 || pointer < this.nums.size) {
+                now += this.nums[pointer].toString()
+                pointer += 1
+            }
+            if (UnsignedBigInteger(now).compareTo(other) == -1) return UnsignedBigInteger(res)
+            var number = UnsignedBigInteger("0")
+            while (number.times(other).compareTo(UnsignedBigInteger(now)) < 1) number.plus(UnsignedBigInteger("1"))
+            number = number.minus(UnsignedBigInteger("1"))
+            res += number.nums.toString()
+            now = this.minus(number.times(other)).toString()
         }
-        return bufer.minus(UnsignedBigInteger("1"))
+        return UnsignedBigInteger(res.removePrefix("0"))
     }*/
 
     /**
@@ -157,7 +165,11 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Преобразование в строку
      */
-    override fun toString() = super.toString()
+    override fun toString(): String {
+        var st = ""
+        for (i in this.nums) st += i
+        return st
+    }
 
     /**
      * Преобразование в целое
