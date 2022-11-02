@@ -19,7 +19,7 @@ internal class UnsignedBigIntegerTest {
     @Tag("8")
     fun ubiMinus() {
         assertEquals(UnsignedBigInteger(2), UnsignedBigInteger(4) - UnsignedBigInteger(2))
-        assertEquals(UnsignedBigInteger("9087654329"), UnsignedBigInteger("9087654330") - UnsignedBigInteger(1))
+         assertEquals(UnsignedBigInteger("9087654329"), UnsignedBigInteger("9087654330") - UnsignedBigInteger(1))
         assertThrows(ArithmeticException::class.java) {
             UnsignedBigInteger(2) - UnsignedBigInteger(4)
         }
@@ -30,7 +30,7 @@ internal class UnsignedBigIntegerTest {
     fun ubiTimes() {
         assertEquals(
             UnsignedBigInteger("18446744073709551616"),
-            UnsignedBigInteger("4294967296‬") * UnsignedBigInteger("4294967296‬")
+            UnsignedBigInteger("4294967296") * UnsignedBigInteger("4294967296")
         )
     }
 
@@ -38,8 +38,8 @@ internal class UnsignedBigIntegerTest {
     @Tag("16")
     fun ubiDiv() {
         assertEquals(
-            UnsignedBigInteger("4294967296‬"),
-            UnsignedBigInteger("18446744073709551616") / UnsignedBigInteger("4294967296‬")
+            UnsignedBigInteger("4294967296"),
+            UnsignedBigInteger("18446744073709551616") / UnsignedBigInteger("4294967296")
         )
     }
 
@@ -49,7 +49,7 @@ internal class UnsignedBigIntegerTest {
         assertEquals(UnsignedBigInteger(5), UnsignedBigInteger(19) % UnsignedBigInteger(7))
         assertEquals(
             UnsignedBigInteger(0),
-            UnsignedBigInteger("18446744073709551616") % UnsignedBigInteger("4294967296‬")
+            UnsignedBigInteger("18446744073709551616") % UnsignedBigInteger("4294967296")
         )
     }
 

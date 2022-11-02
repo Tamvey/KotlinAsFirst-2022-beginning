@@ -1,7 +1,9 @@
 package lesson11.task1
 
 import java.lang.ArithmeticException
+import java.lang.Exception
 import java.lang.StringBuilder
+
 /**
  * Класс "беззнаковое большое целое число".
  *
@@ -18,17 +20,17 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Конструктор из строки
      */
-    var nums: List<Int>
+    var nums: MutableList<Int>
 
     constructor(s: String) {
-        nums = s.toMutableList().map { it.toString().toInt() }
+        nums = s.toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
     /**
      * Конструктор из целого
      */
     constructor(i: Int) {
-        nums = i.toString().toMutableList().map { it.toString().toInt() }
+        nums = i.toString().toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
     /**
@@ -52,15 +54,59 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Вычитание (бросить ArithmeticException, если this < other)
      */
-    operator fun minus(other: UnsignedBigInteger): UnsignedBigInteger = TODO()/*{
+    operator fun minus(other: UnsignedBigInteger): UnsignedBigInteger {
         if (this.compareTo(other) == -1) throw ArithmeticException()
-
-    }*/
+        if (this.compareTo(other) == 0) return UnsignedBigInteger("0")
+        var new = mutableListOf<Int>()
+        for (i in 0 until this.nums.size) {
+            if (i >= other.nums.size) {
+                new.add(this.nums[this.nums.size - 1 - i])
+            } else {
+                if (this.nums[this.nums.size - 1 - i] < other.nums[other.nums.size - 1 - i]) {
+                    this.nums[this.nums.size - i - 2] = this.nums[this.nums.size - i - 2] - 1
+                    new.add((10 + this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i]) % 10)
+                } else if (this.nums[this.nums.size - 1 - i] == other.nums[other.nums.size - 1 - i]) {
+                    new.add((10 + this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i]) % 10)
+                } else {
+                    new.add(this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i])
+                }
+            }
+        }
+        var st = ""; for (i in new.reversed()) st += i.toString()
+        return UnsignedBigInteger(st)
+    }
 
     /**
      * Умножение
      */
-    operator fun times(other: UnsignedBigInteger): UnsignedBigInteger = TODO()
+    operator fun times(other: UnsignedBigInteger): UnsignedBigInteger {
+        var new = mutableListOf<Int>()
+        for (i in 0 until this.nums.size) {
+            for (j in 0 until other.nums.size) {
+                var got = other.nums[other.nums.size - 1 - j] * this.nums[this.nums.size - 1 - i]
+                if (i + j >= new.size) new.add(0)
+                new[i + j] += got % 10
+                if (new[i + j] / 10 > 0) {
+                    if (i + j + 1 >= new.size) new.add(0)
+                    new[i + j + 1] += new[i + j] / 10
+                    new[i + j] = new[i + j] % 10
+                }
+                if (got / 10 > 0) {
+                    if (i + j + 1 >= new.size) new.add(0)
+                    new[i + j + 1] += got / 10
+                    if (new[i + j + 1] / 10 > 0) {
+                        if (i + j + 2 >= new.size) new.add(0)
+                        new[i + j + 2] += new[i + j + 1] / 10
+                        new[i + j + 1] = new[i + j + 1] % 10
+                    }
+
+                }
+            }
+        }
+        var st = ""; for (i in new.reversed()) st += i.toString()
+        return UnsignedBigInteger(st)
+    }
+
 
     /**
      * Деление
@@ -101,12 +147,19 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Преобразование в строку
      */
-    override fun toString(): String = TODO()
+    override fun toString() = super.toString()
 
     /**
      * Преобразование в целое
      * Если число не влезает в диапазон Int, бросить ArithmeticException
      */
-    fun toInt(): Int = TODO()
+    fun toInt(): Int = TODO() /*{
+        try {
+            var st = ""; for (i in this.nums.reversed()) st += i.toString()
+            return st.toInt()
+        } catch (e: Exception) {
+            throw ArithmeticException()
+        }
+    }*/
 
 }
