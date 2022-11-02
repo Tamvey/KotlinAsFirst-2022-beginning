@@ -124,7 +124,10 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                 } else toDivide += this.nums[pointer].toString()
                 pointer++
             }
-            if (toDivide.isEmpty() || UnsignedBigInteger(toDivide).compareTo(other) == -1) return UnsignedBigInteger(res)
+            if (toDivide.isEmpty() || UnsignedBigInteger(toDivide).compareTo(other) == -1) {
+                if (res.isEmpty()) return UnsignedBigInteger("0")
+                return UnsignedBigInteger(res)
+            }
             var number = UnsignedBigInteger(0)
             while (number.times(other).compareTo(UnsignedBigInteger(toDivide)) != 1) number = number.plus(UnsignedBigInteger(1))
             number = number.minus(UnsignedBigInteger(1))
@@ -141,7 +144,8 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     operator fun rem(other: UnsignedBigInteger) : UnsignedBigInteger {
         var res = this.minus(this.div(other).times(other)).toString()
         if (res.length == 1 && res[0] == '0') return UnsignedBigInteger(res)
-        return UnsignedBigInteger(res.removePrefix("0"))
+        while (res[0] == '0') res = res.removePrefix("0")
+        return UnsignedBigInteger(res)
     }
 
 
