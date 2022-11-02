@@ -4,6 +4,7 @@ import java.lang.ArithmeticException
 import java.lang.Exception
 import java.lang.StringBuilder
 
+
 /**
  * Класс "беззнаковое большое целое число".
  *
@@ -23,6 +24,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     var nums: MutableList<Int>
 
     constructor(s: String) {
+        if (!s.matches(Regex("""[0-9]+"""))) throw ArithmeticException()
         nums = s.toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
@@ -30,6 +32,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Конструктор из целого
      */
     constructor(i: Int) {
+        if (!i.toString().matches(Regex("""[0-9]+"""))) throw ArithmeticException()
         nums = i.toString().toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
@@ -104,7 +107,6 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
             new.add(last[j].toString().toInt())
         }
         var st = ""; for (i in new.reversed()) st += i.toString()
-        println(st)
         return UnsignedBigInteger(st)
     }
 
