@@ -101,19 +101,27 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                 new[i] = new[i] % 10
             }
         }
-        var last = new[new.size - 1].toString()
+        var last = (new[new.size - 1] / 10).toString()
         new[new.size - 1] = new[new.size - 1] % 10
-        for (j in 1 until last.length) {
+        for (j in 0 until last.length) {
             new.add(last[j].toString().toInt())
         }
         var st = ""; for (i in new.reversed()) st += i.toString()
+        while (st[0] == '0') st = st.removePrefix("0")
         return UnsignedBigInteger(st)
     }
 
     /**
      * Деление
      */
-    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger = TODO()
+    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger = TODO() /*{
+        var bufer = UnsignedBigInteger("1")
+        while (other.times(bufer).compareTo(this) < 1) {
+            bufer = bufer.plus(UnsignedBigInteger("1"))
+            if (bufer.nums.size > 9) println(bufer.nums)
+        }
+        return bufer.minus(UnsignedBigInteger("1"))
+    }*/
 
     /**
      * Взятие остатка
