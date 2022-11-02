@@ -24,16 +24,16 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     var nums: MutableList<Int>
 
     constructor(s: String) {
-        if (!s.matches(Regex("""[0-9]+"""))) throw ArithmeticException()
-        nums = s.toMutableList().map { it.toString().toInt() }.toMutableList()
+        if (!s.matches(Regex("""[0-9]+"""))) nums = mutableListOf(0)
+        else nums = s.toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
     /**
      * Конструктор из целого
      */
     constructor(i: Int) {
-        if (!i.toString().matches(Regex("""[0-9]+"""))) throw ArithmeticException()
-        nums = i.toString().toMutableList().map { it.toString().toInt() }.toMutableList()
+        if (!i.toString().matches(Regex("""[0-9]+"""))) nums = mutableListOf(0)
+        else nums = i.toString().toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
     /**
