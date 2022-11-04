@@ -134,7 +134,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Взятие остатка
      */
-    operator fun rem(other: UnsignedBigInteger) = this.minus(this.div(other).times(other)).toString()
+    operator fun rem(other: UnsignedBigInteger) = this.minus(this.div(other).times(other))
 
 
     /**
