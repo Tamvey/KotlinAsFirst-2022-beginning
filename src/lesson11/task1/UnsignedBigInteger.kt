@@ -117,18 +117,18 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
             some = some.times(UnsignedBigInteger("10"))
         }
         if (ten != 0) ten--
-        for (i in ten downTo -1) {
+        for (i in ten downTo 0) {
             var now = other
-            for (j in 0..i) now = now.times(UnsignedBigInteger("10"))
-            for (k in 1..9) {
+            for (j in 1..i) now = now.times(UnsignedBigInteger("10"))
+            for (k in 1..10) {
                 if (UnsignedBigInteger(k.toString()).times(now).compareTo(initial) == 1) {
-                    new += (k - 1).toString()
+                	new += (k - 1).toString()
                     initial = initial.minus( UnsignedBigInteger((k - 1).toString()).times(now) )
                     break
                 }
             }
         }
-        return UnsignedBigInteger(new.substring(1, new.length))
+        return UnsignedBigInteger(new)
     }
 
     /**
