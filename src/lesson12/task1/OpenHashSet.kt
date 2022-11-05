@@ -21,33 +21,58 @@ class OpenHashSet<T>(val capacity: Int) {
      * Массив для хранения элементов хеш-таблицы
      */
     internal val elements = Array<Any?>(capacity) { null }
+    var amount = 0
 
     /**
      * Число элементов в хеш-таблице
      */
-    val size: Int get() = TODO()
+    val size: Int get() = (this.amount)
 
     /**
      * Признак пустоты
      */
-    fun isEmpty(): Boolean = TODO()
+    fun isEmpty() = (this.amount == 0)
 
     /**
      * Добавление элемента.
      * Вернуть true, если элемент был успешно добавлен,
      * или false, если такой элемент уже был в таблице, или превышена вместимость таблицы.
      */
-    fun add(element: T): Boolean = TODO()
+    fun add(element: T): Boolean {
+        if (this.amount == this.capacity) return false
+        var index = element.hashCode() % elements.size
+        var counter = 0
+        do {
+            var newIndex = (index + counter) % elements.size
+            if (elements[newIndex] == element) return false
+            if (elements[newIndex] == null) {
+                elements[newIndex] = element
+                this.amount += 1
+                return true
+            }
+            counter++
+        } while (elements.size != counter)
+        return false
+    }
 
     /**
      * Проверка, входит ли заданный элемент в хеш-таблицу
      */
-    operator fun contains(element: T): Boolean = TODO()
+    operator fun contains(element: T): Boolean {
+        if (this.amount == 0) return false
+        var index = element.hashCode() % elements.size
+        var counter = 0
+        do {
+            if (elements[(index + counter) % elements.size] == element) return true
+            counter++
+        } while (elements.size != counter)
+        return false
+    }
 
     /**
      * Таблицы равны, если в них одинаковое количество элементов,
      * и любой элемент из второй таблицы входит также и в первую
      */
-    override fun equals(other: Any?): Boolean = TODO()
+    override fun equals(other: Any?) = this.hashCode() == other.hashCode()
 
 }
