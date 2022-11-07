@@ -129,7 +129,8 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                 return UnsignedBigInteger(res)
             }
             var number = UnsignedBigInteger(0)
-            while (number.times(other).compareTo(UnsignedBigInteger(toDivide)) != 1) number = number.plus(UnsignedBigInteger(1))
+            while (number.times(other).compareTo(UnsignedBigInteger(toDivide)) != 1) number =
+                number.plus(UnsignedBigInteger(1))
             number = number.minus(UnsignedBigInteger(1))
             res += number.toString().removePrefix("0")
             toDivide = UnsignedBigInteger(toDivide).minus(other.times(number)).toString()
@@ -141,7 +142,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Взятие остатка
      */
-    operator fun rem(other: UnsignedBigInteger) : UnsignedBigInteger {
+    operator fun rem(other: UnsignedBigInteger): UnsignedBigInteger {
         var res = this.minus(this.div(other).times(other)).toString()
         if (res.length == 1 && res[0] == '0') return UnsignedBigInteger(res)
         while (res[0] == '0') res = res.removePrefix("0")
