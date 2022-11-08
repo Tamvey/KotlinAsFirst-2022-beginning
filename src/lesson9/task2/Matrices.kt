@@ -369,7 +369,7 @@ fun defineIdealCases(m: Matrix<Int>, type: Int) {
     }
 }
 
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO() /*{
     // Определение решенных позиций
     defineIdealCases(idealCase1, 1); defineIdealCases(idealCase2, 2)
     if (betterChoice(matrix, idealCase1) == 0 || betterChoice(matrix, idealCase2) == 0) {
@@ -419,4 +419,4 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
         }
         memorize = now
     }
-}
+}*/

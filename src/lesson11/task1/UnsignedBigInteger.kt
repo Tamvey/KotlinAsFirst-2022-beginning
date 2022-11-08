@@ -35,6 +35,12 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
             Regex("""[^0-9]""").replace(i.toString(), "").toMutableList().map { it.toString().toInt() }.toMutableList()
     }
 
+    fun formString(new: MutableList<Int>): String {
+        var st = ""; for (i in new.reversed()) st += i.toString()
+        while (st.length >= 2 && st[0] == '0') st = st.removePrefix("0")
+        return st
+    }
+
     /**
      * Сложение
      */
@@ -49,8 +55,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
             add = nowSum / 10
         }
         if (add != 0) new.add(add)
-        var st = ""; for (i in new.reversed()) st += i.toString()
-        return UnsignedBigInteger(st)
+        return UnsignedBigInteger(formString(new))
     }
 
     /**
@@ -68,14 +73,13 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                     this.nums[this.nums.size - i - 2] = this.nums[this.nums.size - i - 2] - 1
                     new.add((10 + this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i]) % 10)
                 } else if (this.nums[this.nums.size - 1 - i] == other.nums[other.nums.size - 1 - i]) {
-                    new.add((10 + this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i]) % 10)
+                    new.add(0)
                 } else {
                     new.add(this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i])
                 }
             }
         }
-        var st = ""; for (i in new.reversed()) st += i.toString()
-        return UnsignedBigInteger(st)
+        return UnsignedBigInteger(formString(new))
     }
 
     /**
@@ -85,69 +89,52 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
         var new = mutableListOf<Int>()
         for (i in 0 until this.nums.size) {
             for (j in 0 until other.nums.size) {
-                var got = other.nums[other.nums.size - 1 - j] * this.nums[this.nums.size - 1 - i]
                 if (i + j >= new.size) new.add(0)
-                new[i + j] += got % 10
-                if (got / 10 != 0) {
-                    if (i + j + 1 >= new.size) new.add(0)
-                    new[i + j + 1] += got / 10
-                }
+                var got = other.nums[other.nums.size - 1 - j] * this.nums[this.nums.size - 1 - i]
+                var counter = 0
+                do {
+                    if (i + j + counter >= new.size) new.add(0)
+                    got += new[i + j + counter]
+                    new[i + j + counter] = got % 10
+                    got /= 10
+                    counter += 1
+                } while (got % 10 > 0)
             }
         }
-        for (i in 0 until new.size - 1) {
-            if (new[i] / 10 > 0) {
-                new[i + 1] += new[i] / 10
-                new[i] = new[i] % 10
-            }
-        }
-        var last = (new[new.size - 1] / 10).toString()
-        new[new.size - 1] = new[new.size - 1] % 10
-        for (j in 0 until last.length) {
-            new.add(last[j].toString().toInt())
-        }
-        var st = ""; for (i in new.reversed()) st += i.toString()
-        st = st.removePrefix("0")
-        return UnsignedBigInteger(st)
+        return UnsignedBigInteger(formString(new))
     }
 
     /**
      * Деление
      */
     operator fun div(other: UnsignedBigInteger): UnsignedBigInteger {
-        var pointer = 0
-        var toDivide = ""
-        var res = ""
-        while (pointer < this.nums.size) {
-            while ((toDivide.isEmpty() || UnsignedBigInteger(toDivide).compareTo(other) == -1) && pointer < this.nums.size) {
-                if (toDivide.isEmpty() && this.nums[pointer] == 0) {
-                    res += "0"
-                } else toDivide += this.nums[pointer].toString()
-                pointer++
-            }
-            if (toDivide.isEmpty() || UnsignedBigInteger(toDivide).compareTo(other) == -1) {
-                if (res.isEmpty()) return UnsignedBigInteger("0")
-                return UnsignedBigInteger(res)
-            }
-            var number = UnsignedBigInteger(0)
-            while (number.times(other).compareTo(UnsignedBigInteger(toDivide)) != 1) number =
-                number.plus(UnsignedBigInteger(1))
-            number = number.minus(UnsignedBigInteger(1))
-            res += number.toString().removePrefix("0")
-            toDivide = UnsignedBigInteger(toDivide).minus(other.times(number)).toString()
-            toDivide = toDivide.removePrefix("0")
+        var new = ""
+        var ten = 0
+        var initial = UnsignedBigInteger(this.nums.toString())
+        var some = UnsignedBigInteger("1")
+        while (some.times(other).compareTo(initial) != 1) {
+            ten += 1
+            some = some.times(UnsignedBigInteger("10"))
         }
-        return UnsignedBigInteger(res)
+        if (ten != 0) ten--
+        for (i in ten downTo 0) {
+            var now = other
+            for (j in 1..i) now = now.times(UnsignedBigInteger("10"))
+            for (k in 1..10) {
+                if (UnsignedBigInteger(k.toString()).times(now).compareTo(initial) == 1) {
+                    new += (k - 1).toString()
+                    initial = initial.minus( UnsignedBigInteger((k - 1).toString()).times(now) )
+                    break
+                }
+            }
+        }
+        return UnsignedBigInteger(new)
     }
 
     /**
      * Взятие остатка
      */
-    operator fun rem(other: UnsignedBigInteger): UnsignedBigInteger {
-        var res = this.minus(this.div(other).times(other)).toString()
-        if (res.length == 1 && res[0] == '0') return UnsignedBigInteger(res)
-        while (res[0] == '0') res = res.removePrefix("0")
-        return UnsignedBigInteger(res)
-    }
+    operator fun rem(other: UnsignedBigInteger) = this.minus(this.div(other).times(other))
 
 
     /**
