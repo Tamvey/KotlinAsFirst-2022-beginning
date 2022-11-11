@@ -4,6 +4,8 @@ package lesson9.task2
 
 import lesson9.task1.*
 import kotlin.math.*
+import java.util.HashSet
+import java.util.PriorityQueue
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -369,54 +371,32 @@ fun defineIdealCases(m: Matrix<Int>, type: Int) {
     }
 }
 
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO() /*{
-    // Определение решенных позиций
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    println(matrix)
     defineIdealCases(idealCase1, 1); defineIdealCases(idealCase2, 2)
     if (betterChoice(matrix, idealCase1) == 0 || betterChoice(matrix, idealCase2) == 0) {
         return listOf()
     }
-    //println(matrix)
-    var memorize = mutableMapOf<Int, MutableList<MutableList<Int>>>()
-    for (j in getPossibleMove(getByValue(matrix, 0))) {
-        var number = matrix.get(j)
-        matrix.set(getByValue(matrix, 0), number)
-        matrix.set(j, 0)
-        var vall1 = minOf(betterChoice(idealCase2, matrix), betterChoice(idealCase1, matrix))
-        memorize[vall1] = mutableListOf(mutableListOf(number))
-        matrix.set(getByValue(matrix, number), 0)
-        matrix.set(j, number)
-    }
-    while (true) {
-        var stopper = 0
-        var now = mutableMapOf<Int, MutableList<MutableList<Int>>>()
-        var sortedKeys = memorize.keys.sorted()
-        println(sortedKeys[0])
-        for (i in sortedKeys) {
-            if (stopper == 5) {
-                stopper = 0
-                break
-            }
-            var stopper2 = 0
-            for (k in memorize.getValue(i)) {
-                if (stopper2 == 5) break
-                var nowList = cloneList(k)
-                var bufer = fifteenGameMoves(matrix, nowList.toList())
-                for (j in getPossibleMove(getByValue(bufer, 0))) {
-                    if (nowList.size > 0 && bufer.get(j) == nowList[nowList.size - 1]) continue
-                    var localBufer = clone(bufer)
-                    var localList = cloneList(nowList); localList.add(bufer.get(j))
-                    localBufer.set(getByValue(localBufer, 0), localBufer.get(j))
-                    localBufer.set(j, 0)
-                    var res1 = minOf(betterChoice(idealCase2, localBufer), betterChoice(idealCase1, localBufer))
-                    if (res1 == 0) return localList
-                    if (now.containsKey(res1)) now.getValue(res1).add(localList)
-                    else now.put(res1, mutableListOf(localList))
-                    //println(nowList)
-                }
-                stopper2++
-            }
-            stopper++
+    val comparator: Comparator<MutablePair<MutableList<Int>, Matrix<Int>>> =
+        compareBy { minOf(betterChoice(idealCase1, it.second), betterChoice(idealCase2, it.second)) }
+    var pq = PriorityQueue(comparator)
+    var hs = HashSet<Matrix<Int>>()
+    pq.add(MutablePair(mutableListOf(), matrix))
+    while (pq.isNotEmpty()) {
+        var nowPair = pq.poll()
+        if (betterChoice(nowPair.second, idealCase1) == 0 || betterChoice(nowPair.second, idealCase2) == 0) {
+            return nowPair.first
         }
-        memorize = now
+        for (i in getPossibleMove(getByValue(nowPair.second, 0))) {
+            var newMatrix = clone(nowPair.second)
+            newMatrix.set(getByValue(newMatrix, 0), newMatrix.get(i))
+            newMatrix.set(i, 0)
+            if (hs.contains(newMatrix)) continue
+            else hs.add(newMatrix)
+            var newMas = cloneList(nowPair.first)
+            newMas.add(matrix.get(i))
+            pq.add(MutablePair(newMas, newMatrix))
+        }
     }
-}*/
+    return listOf()
+}
