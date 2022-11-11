@@ -40,10 +40,10 @@ class OpenHashSet<T>(val capacity: Int) {
      */
     fun add(element: T): Boolean {
         if (this.amount == this.capacity) return false
-        var index = element.hashCode() % elements.size
+        val index = element.hashCode() % elements.size
         var counter = 0
         do {
-            var newIndex = (index + counter) % elements.size
+            val newIndex = (index + counter) % elements.size
             if (elements[newIndex] == element) return false
             if (elements[newIndex] == null) {
                 elements[newIndex] = element
@@ -60,13 +60,20 @@ class OpenHashSet<T>(val capacity: Int) {
      */
     operator fun contains(element: T): Boolean {
         if (this.amount == 0) return false
-        var index = element.hashCode() % elements.size
+        val index = element.hashCode() % elements.size
         var counter = 0
         do {
             if (elements[(index + counter) % elements.size] == element) return true
             counter++
         } while (elements.size != counter)
         return false
+    }
+
+    override fun hashCode(): Int {
+        var res = 0
+        for (i in this.elements) res += i.hashCode()
+        res += this.size.hashCode()
+        return res
     }
 
     /**
