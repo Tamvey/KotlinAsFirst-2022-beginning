@@ -374,18 +374,40 @@ fun defineIdealCases(m: Matrix<Int>, type: Int) {
 
 public class Move(var matrix: Matrix<Int>, var moves: MutableList<Int>, var cost: Int)
 
+fun existSolution(matrix: Matrix<Int>): Int {
+    var inv = 0
+    for (i in 0..15) {
+        if (matrix.get(i / 4, i % 4) == 0) continue
+        for (j in 0 until i) {
+            if (matrix.get(j / 4, j % 4) > matrix.get(i / 4, i % 4)) {
+                inv++
+            }
+        }
+    }
+    for (i in 0..15) {
+        if (matrix.get(i / 4, i % 4) == 0) {
+            inv += 1 + i / 4
+        }
+    }
+    return inv
+}
+
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     defineIdealCases(idealCase1, 1); defineIdealCases(idealCase2, 2)
     if (minOf(betterChoice(matrix, idealCase1), betterChoice(matrix, idealCase2)) == 0) {
         return listOf()
     }
+    var exists = existSolution(matrix)
+    var idealCase: Matrix<Int>
+    if (exists % 2 == 0) idealCase = idealCase1
+    else idealCase = idealCase2
     var comparator: Comparator<Move> = Comparator.comparing { it.cost }
     var pq = PriorityQueue(comparator)
     var hs = HashSet<Matrix<Int>>()
     pq.add(Move(matrix, mutableListOf(), 100000))
     while (true) {
         var nowPair = pq.poll()
-        if (minOf(betterChoice(nowPair.matrix, idealCase1), betterChoice(nowPair.matrix, idealCase2)) == 0) {
+        if (betterChoice(nowPair.matrix, idealCase) == 0) {
             return nowPair.moves
         }
         for (i in getPossibleMove(getByValue(nowPair.matrix, 0))) {
@@ -398,7 +420,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
             hs.add(newMatrix)
             var newMas = cloneList(nowPair.moves)
             newMas.add(nowPair.matrix.get(i))
-            pq.add(Move(newMatrix, newMas, minOf(betterChoice(newMatrix, idealCase2), betterChoice(newMatrix, idealCase1))))
+            pq.add(Move(newMatrix, newMas, betterChoice(newMatrix, idealCase)))
         }
     }
     return listOf()
