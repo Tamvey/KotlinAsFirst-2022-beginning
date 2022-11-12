@@ -6,6 +6,7 @@ import lesson9.task1.*
 import kotlin.math.*
 import java.util.HashSet
 import java.util.PriorityQueue
+import kotlin.Comparator
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -346,7 +347,7 @@ fun betterChoice(initial: Matrix<Int>, end: Matrix<Int>): Int {
     var same = 0
     for (i in 0..3) {
         for (j in 0..3) {
-            if (end.get(i, j) == 0 || initial.get(i, j) == 0) continue
+            if (initial.get(i, j) == 0) continue
             same += abs(getByValue(end, initial.get(i, j)).row - i) + abs(getByValue(end, initial.get(i, j)).column - j)
         }
     }
@@ -371,31 +372,33 @@ fun defineIdealCases(m: Matrix<Int>, type: Int) {
     }
 }
 
+public class Move(var matrix: Matrix<Int>, var moves: MutableList<Int>, var cost: Int)
+
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
-    println(matrix)
     defineIdealCases(idealCase1, 1); defineIdealCases(idealCase2, 2)
-    if (betterChoice(matrix, idealCase1) == 0 || betterChoice(matrix, idealCase2) == 0) {
+    if (minOf(betterChoice(matrix, idealCase1), betterChoice(matrix, idealCase2)) == 0) {
         return listOf()
     }
-    val comparator: Comparator<MutablePair<MutableList<Int>, Matrix<Int>>> =
-        compareBy { minOf(betterChoice(idealCase1, it.second), betterChoice(idealCase2, it.second)) }
+    var comparator: Comparator<Move> = Comparator.comparing { it.cost }
     var pq = PriorityQueue(comparator)
     var hs = HashSet<Matrix<Int>>()
-    pq.add(MutablePair(mutableListOf(), matrix))
-    while (pq.isNotEmpty()) {
+    pq.add(Move(matrix, mutableListOf(), 100000))
+    while (true) {
         var nowPair = pq.poll()
-        if (betterChoice(nowPair.second, idealCase1) == 0 || betterChoice(nowPair.second, idealCase2) == 0) {
-            return nowPair.first
+        if (minOf(betterChoice(nowPair.matrix, idealCase1), betterChoice(nowPair.matrix, idealCase2)) == 0) {
+            return nowPair.moves
         }
-        for (i in getPossibleMove(getByValue(nowPair.second, 0))) {
-            var newMatrix = clone(nowPair.second)
+        for (i in getPossibleMove(getByValue(nowPair.matrix, 0))) {
+            var newMatrix = clone(nowPair.matrix)
             newMatrix.set(getByValue(newMatrix, 0), newMatrix.get(i))
             newMatrix.set(i, 0)
-            if (hs.contains(newMatrix)) continue
-            else hs.add(newMatrix)
-            var newMas = cloneList(nowPair.first)
-            newMas.add(matrix.get(i))
-            pq.add(MutablePair(newMas, newMatrix))
+            if (hs.contains(newMatrix)) {
+                continue
+            }
+            hs.add(newMatrix)
+            var newMas = cloneList(nowPair.moves)
+            newMas.add(nowPair.matrix.get(i))
+            pq.add(Move(newMatrix, newMas, minOf(betterChoice(newMatrix, idealCase2), betterChoice(newMatrix, idealCase1))))
         }
     }
     return listOf()
