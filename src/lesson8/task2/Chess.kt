@@ -205,16 +205,16 @@ fun knightMoveNumber(start: Square, end: Square): Int {
     while (true) {
         val new = mutableSetOf<Square>()
         for (j in sqs) {
-            if (mas[j.column][j.row] > now || mas[j.column][j.row] == 0) {
+            if (mas[j.column - 1][j.row - 1] > now || mas[j.column - 1][j.row - 1] == 0) {
                 new += getPossibleMoves(j)
-                mas[j.column][j.row] = now
+                mas[j.column - 1][j.row - 1] = now
             }
         }
         if (new.isEmpty()) break
         sqs = new.toMutableList()
         now++
     }
-    return mas[end.column][end.row]
+    return mas[end.column - 1][end.row - 1]
 }
 
 /**

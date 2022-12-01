@@ -276,8 +276,8 @@ fun top20Words(inputName: String): Map<String, Int> {
     // Counting amount of each word -> res
     for (i in ifile) {
         val now = Regex("""[ ]+""").split(
-            Regex("""[^а-яА-яa-zA-Zё]""")
-                .replace(i, " ").lowercase()
+            Regex("""[^а-яa-zё]""")
+                .replace(i.lowercase(), " ")
         ).filter { it != " " && it != "" }.toMutableList()
         for (word in now) {
             if (!res.containsKey(word)) {
