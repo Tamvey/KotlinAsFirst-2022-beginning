@@ -57,7 +57,7 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl<E>(h
  * Реализация интерфейса "матрица"
  */
 class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : Matrix<E> {
-    private val allCells: MutableList<MutablePair<Cell, E>> = mutableListOf()
+    private val allCells = arrayListOf<MutablePair<Cell, E>>()
 
     init {
         for (i in 0 until height) {
@@ -69,21 +69,16 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
 
 
     override fun get(row: Int, column: Int): E {
-        for (i in allCells) {
-            if (i.first.row == row && i.first.column == column)
-                return i.second
-        }
+        if (row in 0 until height && column in 0 until width) return allCells[width * row + column].second;
         throw IllegalArgumentException()
     }
 
     override fun get(cell: Cell) = get(cell.row, cell.column)
 
     override fun set(row: Int, column: Int, value: E) {
-        for (i in allCells) {
-            if (i.first.row == row && i.first.column == column) {
-                i.second = value
-                return
-            }
+        if (row in 0 until height && column in 0 until width) {
+            allCells[row * width + column].second = value;
+            return;
         }
         throw IllegalArgumentException()
     }
@@ -91,6 +86,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
     override fun set(cell: Cell, value: E) = set(cell.row, cell.column, value)
 
     override fun equals(other: Any?): Boolean {
+        if (other === this) return true;
         if (other?.javaClass != this.javaClass) return false
         other as Matrix<Any?>
         for (i in 0..3) {

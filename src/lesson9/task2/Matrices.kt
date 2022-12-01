@@ -408,6 +408,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     while (true) {
         var nowPair = pq.poll()
         if (betterChoice(nowPair.matrix, idealCase) == 0) {
+            println(nowPair.moves);
             return nowPair.moves
         }
         for (i in getPossibleMove(getByValue(nowPair.matrix, 0))) {

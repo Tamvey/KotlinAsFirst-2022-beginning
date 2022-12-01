@@ -21,10 +21,10 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     /**
      * Конструктор из строки
      */
-    var nums: MutableList<Int>
+    val nums: MutableList<Byte>
 
     constructor(s: String) {
-        nums = Regex("""[^0-9]""").replace(s, "").toMutableList().map { it.toString().toInt() }.toMutableList()
+        nums = Regex("""[^0-9]""").replace(s, "").toMutableList().map { it.toString().toByte() }.toMutableList()
     }
 
     /**
@@ -32,10 +32,10 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      */
     constructor(i: Int) {
         nums =
-            Regex("""[^0-9]""").replace(i.toString(), "").toMutableList().map { it.toString().toInt() }.toMutableList()
+            Regex("""[^0-9]""").replace(i.toString(), "").toMutableList().map { it.toString().toByte() }.toMutableList()
     }
 
-    fun formString(new: MutableList<Int>): String {
+    fun formString(new: MutableList<Byte>): String {
         var st = ""; for (i in new.reversed()) st += i.toString()
         while (st.length >= 2 && st[0] == '0') st = st.removePrefix("0")
         return st
@@ -45,16 +45,16 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Сложение
      */
     operator fun plus(other: UnsignedBigInteger): UnsignedBigInteger {
-        var new = mutableListOf<Int>()
+        var new = mutableListOf<Byte>()
         var add = 0
         for (i in 0..maxOf(nums.size - 1, other.nums.size - 1)) {
             var nowSum = add
             if (i < nums.size) nowSum += nums[nums.size - 1 - i]
             if (i < other.nums.size) nowSum += other.nums[other.nums.size - 1 - i]
-            new.add(nowSum % 10)
+            new.add((nowSum % 10).toByte())
             add = nowSum / 10
         }
-        if (add != 0) new.add(add)
+        if (add != 0) new.add(add.toByte())
         return UnsignedBigInteger(formString(new))
     }
 
@@ -64,18 +64,18 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     operator fun minus(other: UnsignedBigInteger): UnsignedBigInteger {
         if (this.compareTo(other) == -1) throw ArithmeticException()
         if (this.compareTo(other) == 0) return UnsignedBigInteger("0")
-        var new = mutableListOf<Int>()
+        var new = mutableListOf<Byte>()
         for (i in 0 until this.nums.size) {
             if (i >= other.nums.size) {
                 new.add(this.nums[this.nums.size - 1 - i])
             } else {
                 if (this.nums[this.nums.size - 1 - i] < other.nums[other.nums.size - 1 - i]) {
-                    this.nums[this.nums.size - i - 2] = this.nums[this.nums.size - i - 2] - 1
-                    new.add((10 + this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i]) % 10)
+                    this.nums[this.nums.size - i - 2] = (this.nums[this.nums.size - i - 2] - 1).toByte()
+                    new.add(((10 + this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i]) % 10).toByte())
                 } else if (this.nums[this.nums.size - 1 - i] == other.nums[other.nums.size - 1 - i]) {
                     new.add(0)
                 } else {
-                    new.add(this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i])
+                    new.add((this.nums[this.nums.size - 1 - i] - other.nums[other.nums.size - 1 - i]).toByte())
                 }
             }
         }
@@ -86,7 +86,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Умножение
      */
     operator fun times(other: UnsignedBigInteger): UnsignedBigInteger {
-        var new = mutableListOf<Int>()
+        var new = mutableListOf<Byte>()
         for (i in 0 until this.nums.size) {
             for (j in 0 until other.nums.size) {
                 if (i + j >= new.size) new.add(0)
@@ -95,12 +95,13 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                 do {
                     if (i + j + counter >= new.size) new.add(0)
                     got += new[i + j + counter]
-                    new[i + j + counter] = got % 10
+                    new[i + j + counter] = (got % 10).toByte()
                     got /= 10
                     counter += 1
                 } while (got % 10 > 0)
             }
         }
+
         return UnsignedBigInteger(formString(new))
     }
 
@@ -123,7 +124,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
             for (k in 1..10) {
                 if (UnsignedBigInteger(k.toString()).times(now).compareTo(initial) == 1) {
                     new += (k - 1).toString()
-                    initial = initial.minus( UnsignedBigInteger((k - 1).toString()).times(now) )
+                    initial = initial.minus(UnsignedBigInteger((k - 1).toString()).times(now))
                     break
                 }
             }
@@ -143,10 +144,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is UnsignedBigInteger) return false
-        if (this.nums.size != other.nums.size) return false
-        for (i in 0 until this.nums.size) {
-            if (this.nums[i] != other.nums[i]) return false
-        }
+        if (nums != other.nums) return false
         return true
     }
 
@@ -167,8 +165,9 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Преобразование в строку
      */
     override fun toString(): String {
-        var st = ""
-        for (i in this.nums) st += i
+        val st = buildString {
+            for (i in nums) append(i);
+        }
         return st
     }
 

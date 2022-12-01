@@ -2,6 +2,7 @@
 
 package lesson8.task2
 
+//import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
 /**
  * Клетка шахматной доски. Шахматная доска квадратная и имеет 8 х 8 клеток.
  * Поэтому, обе координаты клетки (горизонталь row, вертикаль column) могут находиться в пределах от 1 до 8.
@@ -32,13 +33,9 @@ data class Square(val column: Int, val row: Int) {
  * В нотации, колонки обозначаются латинскими буквами от a до h, а ряды -- цифрами от 1 до 8.
  * Если нотация некорректна, бросить IllegalArgumentException
  */
-fun square(notation: String): Square {
-    var st = " abcdefgh"
-    if (notation.length != 2) throw IllegalArgumentException()
-    if (st.indexOf(notation[0]) !in 1..8) throw IllegalArgumentException()
-    if (notation[1] !in "12345678") throw IllegalArgumentException()
-    return Square(st.indexOf(notation[0]), notation[1].digitToInt())
-}
+fun square(notation: String) =
+    if (Regex("""[a-h][1-8]""").matches(notation)) Square(" abcdefgh".indexOf(notation[0]), notation[1].digitToInt())
+    else throw IllegalArgumentException()
 
 /**
  * Простая (2 балла)
@@ -188,11 +185,11 @@ fun kingTrajectory(start: Square, end: Square): List<Square> = TODO()
  * Конь может последовательно пройти через клетки (5, 2) и (4, 4) к клетке (6, 3).
  */
 fun getPossibleMoves(sq: Square): MutableList<Square> {
-    var res = mutableListOf<Square>()
+    val res = mutableListOf<Square>()
     for (i in listOf(-2, 2)) {
         for (j in listOf(-1, 1)) {
-            if (sq.column + i in 1..8 && sq.row + j in 1..8) res.add(Square(sq.column + i, sq.row + j))
-            if (sq.column + j in 1..8 && sq.row + i in 1..8) res.add(Square(sq.column + j, sq.row + i))
+            if (Square(sq.column + i, sq.row + j).inside()) res.add(Square(sq.column + i, sq.row + j))
+            if (Square(sq.column + j, sq.row + i).inside()) res.add(Square(sq.column + j, sq.row + i))
         }
     }
     return res
@@ -200,20 +197,13 @@ fun getPossibleMoves(sq: Square): MutableList<Square> {
 
 // Решение очень похоже на волновой алгоритм в графе
 fun knightMoveNumber(start: Square, end: Square): Int {
-    if (start.column !in 1..8 || start.row !in 1..8 ||
-        end.column !in 1..8 || end.row !in 1..8
-    ) throw IllegalArgumentException()
+    if (!start.inside() || !end.inside()) throw IllegalArgumentException()
     if (start == end) return 0
-    var mas = mutableListOf<MutableList<Int>>()
-    for (i in 0..8) {
-        var now = mutableListOf<Int>()
-        for (j in 0..8) now.add(0)
-        mas.add(now)
-    }
+    val mas = MutableList(8) { MutableList(8) { 0 } }
     var sqs = getPossibleMoves(start)
     var now = 1
     while (true) {
-        var new = mutableSetOf<Square>()
+        val new = mutableSetOf<Square>()
         for (j in sqs) {
             if (mas[j.column][j.row] > now || mas[j.column][j.row] == 0) {
                 new += getPossibleMoves(j)
@@ -251,33 +241,21 @@ fun knightMoveNumber(start: Square, end: Square): Int {
 // Решение аналогично прошлому, нужно лишь дополнительно сохранять предыдущие ходы
 
 fun knightTrajectory(start: Square, end: Square): List<Square> {
-    if (start == end) return listOf(start)
-    var mas = mutableListOf<MutableList<Int>>()
-    for (i in 0..8) {
-        var now = mutableListOf<Int>()
-        for (j in 0..8) now.add(0)
-        mas.add(now)
-    }
-    var memorizeMoves = mutableMapOf<Square, MutableList<Square>>()
-    memorizeMoves.put(start, mutableListOf(start))
-
-    var sqs = mutableMapOf<Square, MutableList<Square>>()
-    sqs.put(start, getPossibleMoves(start))
-    var now = 1
+    val mas = MutableList(8) { MutableList(8) { 0 } }
+    var memorizeMoves = mutableMapOf(Pair(start, mutableListOf(start)))
+    var moves = 1
     while (true) {
-        var new = mutableMapOf<Square, MutableList<Square>>()
-        for (j in sqs) {
-            for (k in j.value) {
-                if (mas[k.column][k.row] > now || mas[k.column][k.row] == 0) {
-                    mas[k.column][k.row] = now
-                    memorizeMoves.put(k, memorizeMoves.getValue(j.key).plus(listOf(k)).toMutableList())
-                    new.put(k, getPossibleMoves(k))
+        if (memorizeMoves.keys.contains(end)) return memorizeMoves.getValue(end)
+        val bufer = mutableMapOf<Square, MutableList<Square>>()
+        for (nowSqs in memorizeMoves.keys) {
+            for (nextSq in getPossibleMoves(nowSqs)) {
+                if (moves + 1 < mas[nextSq.row - 1][nextSq.column - 1] || mas[nextSq.row - 1][nextSq.column - 1] == 0) {
+                    mas[nextSq.row - 1][nextSq.column - 1] = moves + 1
+                    bufer.put(nextSq, memorizeMoves.getValue(nowSqs).plus(nextSq).toMutableList())
                 }
             }
         }
-        if (new.isEmpty()) break
-        sqs = new
-        now++
+        memorizeMoves = bufer
+        moves++
     }
-    return memorizeMoves.getValue(end)
 }

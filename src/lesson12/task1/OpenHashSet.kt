@@ -20,18 +20,18 @@ class OpenHashSet<T>(val capacity: Int) {
     /**
      * Массив для хранения элементов хеш-таблицы
      */
-    internal val elements = Array<Any?>(capacity) { null }
-    var amount = 0
+    internal val elements = Array<Any?>(capacity) { Any() }
+    private var amount = 0
 
     /**
      * Число элементов в хеш-таблице
      */
-    val size: Int get() = (this.amount)
+    val size: Int get() = this.amount
 
     /**
      * Признак пустоты
      */
-    fun isEmpty() = (this.amount == 0)
+    fun isEmpty() = this.amount == 0
 
     /**
      * Добавление элемента.
@@ -45,7 +45,7 @@ class OpenHashSet<T>(val capacity: Int) {
         do {
             val newIndex = (index + counter) % elements.size
             if (elements[newIndex] == element) return false
-            if (elements[newIndex] == null) {
+            if (elements[newIndex]?.javaClass == Any().javaClass) {
                 elements[newIndex] = element
                 this.amount += 1
                 return true
@@ -69,12 +69,8 @@ class OpenHashSet<T>(val capacity: Int) {
         return false
     }
 
-    override fun hashCode(): Int {
-        var res = 0
-        for (i in this.elements) res += i.hashCode()
-        res += this.size.hashCode()
-        return res
-    }
+    override fun hashCode() = this.size.hashCode() +
+            this.elements.map { i -> if (i?.javaClass != Any().javaClass) i.hashCode() else 0 }.sumOf { it }
 
     /**
      * Таблицы равны, если в них одинаковое количество элементов,
@@ -83,11 +79,11 @@ class OpenHashSet<T>(val capacity: Int) {
 
 
     override fun equals(other: Any?): Boolean {
+        if (this === other) return true
         if (other?.javaClass != this.javaClass) return false
-        if (this.hashCode() == other.hashCode()) return true
+        if (this.hashCode() != other.hashCode()) return false
         other as OpenHashSet<Any?>
-        if (other.size != this.size) return false
-        for (i in this.elements) if (!other.contains(i)) return false
+        for (i in this.elements) if (i?.javaClass != Any().javaClass) if (!other.contains(i)) return false
         return true
     }
 }

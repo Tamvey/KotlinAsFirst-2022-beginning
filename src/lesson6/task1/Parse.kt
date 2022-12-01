@@ -3,7 +3,6 @@
 package lesson6.task1
 
 import lesson2.task2.daysInMonth
-import lesson7.task1.count
 import java.lang.IndexOutOfBoundsException
 import java.lang.StringBuilder
 
@@ -66,7 +65,13 @@ fun main() {
         println("Достигнут <конец файла> в процессе чтения строки. Программа прервана")
     }
 }
-
+fun count(initial: String): Int {
+    var res = 0
+    for (i in initial) {
+        if (i == '\n') res++
+    }
+    return res
+}
 
 /**
  * Средняя (4 балла)

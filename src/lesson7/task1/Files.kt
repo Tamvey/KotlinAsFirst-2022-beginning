@@ -2,10 +2,7 @@
 
 package lesson7.task1
 
-import ru.spbstu.ktuples.zip
-import ru.spbstu.wheels.out
 import java.io.File
-import java.util.Stack
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -65,17 +62,10 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Все остальные строки должны быть перенесены без изменений, включая пустые строки.
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
-fun count(initial: String): Int {
-    var res = 0
-    for (i in initial) {
-        if (i == '\n') res++
-    }
-    return res
-}
 
 fun deleteMarked(inputName: String, outputName: String) {
     val ifile = File(inputName).readLines()
-    var ofile = File(outputName).bufferedWriter().use { ofile ->
+    File(outputName).bufferedWriter().use { ofile ->
         for (i in ifile) {
             if (!i.isEmpty()) {
                 if (i[0] != '_') ofile.write(i + "\n")
@@ -93,24 +83,21 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countWords(line: String, word: String): Int {
+fun countWords(text: String, word: String): Int {
     var res = 0
-    for (i in minOf(line.length, word.length - 1) until line.length) {
-        if (word.lowercase() == line.substring(i - (word.length - 1), i + 1).lowercase()) res++
+    var fromm = 0
+    while (text.indexOf(word, fromm) != -1) {
+        fromm = text.indexOf(word, fromm) + 1
+        res += 1
     }
     return res
 }
 
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val res: MutableMap<String, Int> = mutableMapOf()
-    val file = File(inputName).readLines()
-    for (line in file) {
-        for (word in substrings.toSet()) {
-            if (!res.containsKey(word)) {
-                res.put(word, 0)
-            }
-            res.put(word, res.getValue(word) + countWords(line, word))
-        }
+    val file = File(inputName).readText().lowercase()
+    for (word in substrings.toSet()) {
+        res[word] = countWords(file, word.lowercase())
     }
     return res
 }
@@ -129,27 +116,16 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    val letters1 = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
-    val letters2 = listOf('Ы', 'Я', 'Ю', 'ы', 'я', 'ю')
+    val letters1 = setOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
+    val letters2 = setOf('Ы', 'Я', 'Ю', 'ы', 'я', 'ю')
     val toChange = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
     val ifile = File(inputName).readText()
-    var ofile = File(outputName).bufferedWriter().use { ofile ->
-        if (ifile.length == 0) ofile.write("")
-        else {
-            ofile.write(ifile[0].toString())
-            for (i in minOf(1, ifile.length - 1) until ifile.length) {
-                if (ifile[i] in letters2 && ifile[i - 1] in letters1) {
-                    try {
-                        if (ifile.substring(i - 1, i + 3).lowercase() != "жури" && ifile.substring(i - 4, i + 2)
-                                .lowercase() != "брошур" && ifile.substring(i - 5, i + 2).lowercase() != "парашут"
-                        ) {
-                            ofile.write(toChange.getValue(ifile[i]).toString())
-                        } else ofile.write(ifile[i].toString())
-                    } catch (e: Exception) {
-                        ofile.write(toChange.getValue(ifile[i]).toString())
-                    }
-                } else ofile.write(ifile[i].toString())
-            }
+    File(outputName).bufferedWriter().use { ofile ->
+        if (ifile.isNotEmpty()) ofile.write(ifile[0].toString())
+        for (i in 1 until minOf(ifile.length, ifile.length)) {
+            if (ifile[i - 1] in letters1 && ifile[i] in letters2) {
+                ofile.write(toChange.getValue(ifile[i]).toString())
+            } else ofile.write(ifile[i].toString())
         }
     }
 }
@@ -172,18 +148,18 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    val ifile = File(inputName).readLines()
-    val ofile = File(outputName).bufferedWriter()
-    var maxLength = 0
-    for (i in ifile) {
-        if (i.trim().length > maxLength) maxLength = i.trim().length
+    File(outputName).bufferedWriter().use { ofile ->
+        val ifile = File(inputName).readLines().map { it.trim() }
+        var maxLength = 0
+        for (i in ifile) {
+            if (i.length > maxLength) maxLength = i.length
+        }
+        for (i in ifile) {
+            for (j in 0 until (maxLength - i.length) / 2) ofile.write(" ")
+            ofile.write(i)
+            ofile.newLine()
+        }
     }
-    for (i in ifile) {
-        for (j in 0 until (maxLength - i.trim().length) / 2) ofile.write(" ")
-        ofile.write(i.trim())
-        ofile.newLine()
-    }
-    ofile.close()
 }
 
 /**
@@ -229,53 +205,47 @@ fun divideSpaces(all: Int, am: Int): MutableList<Int> {
     return res
 }
 
-fun someTimes(n: String, t: Int): String {
-    var new = ""
-    for (j in 1..t) new += n
-    return new
-}
 
 fun alignFileByWidth(inputName: String, outputName: String) {
     val ifile = File(inputName).readLines()
-    val ofile = File(outputName).bufferedWriter()
-    var maxLength = 0
-    // Find the longest line with only one space between words
-    for (i in ifile) {
-        var length = 0
-        var times = 0
-        for (j in i.split(" ")) {
-            length += j.length
-            if (j.length > 0) times++
+    File(outputName).bufferedWriter().use { ofile ->
+        var maxLength = 0
+        // Find the longest line with only one space between words
+        for (i in ifile) {
+            var length = 0
+            var times = 0
+            for (j in i.split(" ")) {
+                length += j.length
+                if (j.isNotEmpty()) times++
+            }
+            if (times > 0) times--
+            length += times
+            maxLength = maxOf(maxLength, length)
         }
-        if (times > 0) times--
-        length += times
-        maxLength = maxOf(maxLength, length)
-    }
-    // Processing all lines
-    for (i in ifile) {
-        val now = i.trim()
-        if (now.length == 0) {
-            ofile.newLine(); continue
-        }
+        // Processing all lines
+        for (i in ifile) {
+            val now = i.trim()
+            if (now.isBlank()) {
+                ofile.newLine(); continue
+            }
 
-        var lettersForWords = 0
-        var words = 0
-        for (j in now.split(" ")) {
-            lettersForWords += j.length
-            if (j.length > 0) words++
+            var lettersForWords = 0
+            var words = 0
+            for (j in now.split(" ")) {
+                lettersForWords += j.length
+                if (j.isNotEmpty()) words++
+            }
+            val spaces = maxLength - lettersForWords
+            var mas: List<Int> = listOf(0)
+            if (words > 1) mas = divideSpaces(spaces, words - 1)
+            val buffer = i.split(" ").filter { it -> it != "" }.toMutableList()
+            for (i in 0 until buffer.size) {
+                if (i < buffer.size - 1) ofile.write(buffer[i] + " ".repeat(mas[i]))
+                else ofile.write(buffer[i])
+            }
+            ofile.newLine()
         }
-        val spaces = maxLength - lettersForWords
-        var one = 0
-        var mas: List<Int> = listOf(0)
-        if (words > 1) mas = divideSpaces(spaces, words - 1)
-        val buffer = i.split(" ").toMutableList(); while ("" in buffer) buffer.remove("")
-        for (i in 0 until buffer.size) {
-            if (i < buffer.size - 1) ofile.write(buffer[i] + someTimes(" ", mas[i]))
-            else ofile.write(buffer[i])
-        }
-        ofile.newLine()
     }
-    ofile.close()
 }
 
 /**
@@ -299,23 +269,16 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  *
  */
 // Delete symbols except of letters
-fun change(line: String): String {
-    val posLet = "йцукенгшщзхъэждлорпавыфячсмитьбюёqwertyuiopasdfghjklzxcvbnm"
-    var new = ""
-    for (i in line) {
-        if (i.toString() in posLet) new += i.toString()
-        else new += " "
-    }
-    return new
-}
 
 fun top20Words(inputName: String): Map<String, Int> {
     val ifile = File(inputName).readLines()
     val res: MutableMap<String, Int> = mutableMapOf()
     // Counting amount of each word -> res
     for (i in ifile) {
-        val now = change(i.lowercase()).split(" ").toMutableList()
-        while ("" in now) now.remove("")
+        val now = Regex("""[ ]+""").split(
+            Regex("""[^а-яА-яa-zA-Zё]""")
+                .replace(i, " ").lowercase()
+        ).filter { it != " " && it != "" }.toMutableList()
         for (word in now) {
             if (!res.containsKey(word)) {
                 res.put(word, 1)
@@ -323,9 +286,8 @@ fun top20Words(inputName: String): Map<String, Int> {
         }
     }
     // Sorting, reversion res and choosing 20 or more words
-    var listOfPairs = res.toList()
+    val listOfPairs = res.toList().sortedBy { it -> it.second }.reversed()
     val res1: MutableMap<String, Int> = mutableMapOf()
-    listOfPairs = listOfPairs.sortedBy { it -> it.second }.reversed()
     for (i in listOfPairs.indices) {
         if (i <= 19 || (i > 19 && listOfPairs[i].second == listOfPairs[i - 1].second)) res1.put(
             listOfPairs[i].first, listOfPairs[i].second
@@ -647,62 +609,60 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
 fun writeLeft(str: String, from: Int) = str.filterIndexed { index, c -> index > from }
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    var stack = Stack<Int>()
+    val stack = ArrayDeque<Int>()
     var spaces = -4
-    var ifile = File(inputName).readLines()
-    var ofile = File(outputName).bufferedWriter()
-    ofile.write("<html><body><p>")
-    for (line in ifile) {
-        // Counter of index
-        var j = 0
-        // Counter of spaces
-        var nowSpaces = 0
-        // Counting spaces
-        while (true) {
-            if (line[j] == ' ') {
+    val ifile = File(inputName).readLines()
+    File(outputName).bufferedWriter().use { ofile ->
+        ofile.write("<html><body><p>")
+        for (line in ifile) {
+            // Counter of index
+            var j = 0
+            // Counter of spaces
+            var nowSpaces = 0
+            // Counting spaces
+            while (line[j] == ' ') {
                 nowSpaces++
-            } else break
-            j++
-        }
-        if (line[j] != '*') j = line.indexOf('.')
-        //
-        if (nowSpaces - spaces == -4) {
-            for (k in 0..1) {
-                val returned = stack.pop()
-                when (returned) {
-                    1 -> ofile.write("</ol>")
-                    0 -> ofile.write("</ul>")
-                    2 -> ofile.write("</li>")
+                j++
+            }
+            if (line[j] != '*') j = line.indexOf('.')
+            //
+            if (nowSpaces - spaces == -4) {
+                for (k in 0..1) {
+                    val returned = stack.removeLast()
+                    when (returned) {
+                        1 -> ofile.write("</ol>")
+                        0 -> ofile.write("</ul>")
+                        2 -> ofile.write("</li>")
+                    }
                 }
             }
-        }
-        if (nowSpaces - spaces == 4) {
-            if (line[j] == '.') {
-                ofile.write("<ol>")
-                ofile.write("<li>")
-                stack.push(1)
-                stack.push(2)
+            if (nowSpaces - spaces == 4) {
+                if (line[j] == '.') {
+                    ofile.write("<ol>")
+                    ofile.write("<li>")
+                    stack.addLast(1)
+                    stack.addLast(2)
+                } else {
+                    ofile.write("<ul>")
+                    ofile.write("<li>")
+                    stack.addLast(0)
+                    stack.addLast(2)
+                }
             } else {
-                ofile.write("<ul>")
+                ofile.write("</li>")
                 ofile.write("<li>")
-                stack.push(0)
-                stack.push(2)
             }
-        } else {
-            ofile.write("</li>")
-            ofile.write("<li>")
+            ofile.write(writeLeft(line, j))
+            ofile.write("\n")
+            spaces = nowSpaces
         }
-        ofile.write(writeLeft(line, j))
-        ofile.write("\n")
-        spaces = nowSpaces
+        for (i in stack.reversed()) when {
+            i == 1 -> ofile.write("</ol>")
+            i == 0 -> ofile.write("</ul>")
+            else -> ofile.write("</li>")
+        }
+        ofile.write("</p></body></html>")
     }
-    for (i in stack.reversed()) when {
-        i == 1 -> ofile.write("</ol>")
-        i == 0 -> ofile.write("</ul>")
-        else -> ofile.write("</li>")
-    }
-    ofile.write("</p></body></html>")
-    ofile.close()
 }
 
 /**
