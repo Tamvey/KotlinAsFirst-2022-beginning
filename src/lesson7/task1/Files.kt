@@ -614,9 +614,6 @@ enum class Tag(val str: String, val lstr: String) {
 
 fun markdownToHtmlLists(inputName: String, outputName: String) {
     val stack = ArrayDeque<Tag>()
-    val ol = Tag.ol
-    val ul = Tag.ul
-    val li = Tag.li
     var spaces = -4
     val ifile = File(inputName).readLines()
     File(outputName).bufferedWriter().use { ofile ->
@@ -637,36 +634,36 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
                 for (k in 0..1) {
                     val returned = stack.removeLast()
                     when (returned) {
-                        ol -> ofile.write(ol.lstr)
-                        ul -> ofile.write(ul.lstr)
-                        else -> ofile.write(li.lstr)
+                        Tag.ol -> ofile.write(Tag.ol.lstr)
+                        Tag.ul -> ofile.write(Tag.ul.lstr)
+                        else -> ofile.write(Tag.li.lstr)
                     }
                 }
             }
             if (nowSpaces - spaces == 4) {
                 if (line[j] == '.') {
-                    ofile.write(ol.str)
-                    ofile.write(li.str)
-                    stack.addLast(ol)
-                    stack.addLast(li)
+                    ofile.write(Tag.ol.str)
+                    ofile.write(Tag.li.str)
+                    stack.addLast(Tag.ol)
+                    stack.addLast(Tag.li)
                 } else {
-                    ofile.write(ul.str)
-                    ofile.write(li.str)
-                    stack.addLast(ul)
-                    stack.addLast(li)
+                    ofile.write(Tag.ul.str)
+                    ofile.write(Tag.li.str)
+                    stack.addLast(Tag.ul)
+                    stack.addLast(Tag.li)
                 }
             } else {
-                ofile.write(li.lstr)
-                ofile.write(li.str)
+                ofile.write(Tag.li.lstr)
+                ofile.write(Tag.li.str)
             }
             ofile.write(writeLeft(line, j))
             ofile.write("\n")
             spaces = nowSpaces
         }
         for (i in stack.reversed()) when {
-            i == ol -> ofile.write(ol.lstr)
-            i == ul -> ofile.write(ul.lstr)
-            else -> ofile.write(li.lstr)
+            i == Tag.ol -> ofile.write(Tag.ol.lstr)
+            i == Tag.ul -> ofile.write(Tag.ul.lstr)
+            else -> ofile.write(Tag.li.lstr)
         }
         ofile.write("</p></body></html>")
     }
