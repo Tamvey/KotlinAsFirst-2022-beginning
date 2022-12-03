@@ -608,8 +608,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  */
 
 fun writeLeft(str: String, from: Int) = str.filterIndexed { index, c -> index > from }
-enum class Tag(val place: Int, val str: String, val lstr: String) {
-    ul(0, "<ul>", "</ul>"), ol(1, "<ol>", "</ol>"), li(2, "<li>", "</li>")
+enum class Tag(val str: String, val lstr: String) {
+    ul("<ul>", "</ul>"), ol("<ol>", "</ol>"), li("<li>", "</li>")
 }
 
 fun markdownToHtmlLists(inputName: String, outputName: String) {
@@ -636,10 +636,10 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
             if (nowSpaces - spaces == -4) {
                 for (k in 0..1) {
                     val returned = stack.removeLast()
-                    when (returned.place) {
-                        1 -> ofile.write(ol.lstr)
-                        0 -> ofile.write(ul.lstr)
-                        2 -> ofile.write(li.lstr)
+                    when (returned) {
+                        ol -> ofile.write(ol.lstr)
+                        ul -> ofile.write(ul.lstr)
+                        else -> ofile.write(li.lstr)
                     }
                 }
             }
@@ -664,8 +664,8 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
             spaces = nowSpaces
         }
         for (i in stack.reversed()) when {
-            i.place == 1 -> ofile.write(ol.lstr)
-            i.place == 0 -> ofile.write(ul.lstr)
+            i == ol -> ofile.write(ol.lstr)
+            i == ul -> ofile.write(ul.lstr)
             else -> ofile.write(li.lstr)
         }
         ofile.write("</p></body></html>")
