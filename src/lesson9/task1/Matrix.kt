@@ -57,7 +57,7 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl<E>(h
  * Реализация интерфейса "матрица"
  */
 class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : Matrix<E> {
-    private val allCells = arrayListOf<MutablePair<Cell, E>>()
+    var allCells = arrayListOf<MutablePair<Cell, E>>()
 
     init {
         for (i in 0 until height) {
@@ -89,12 +89,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
         if (other === this) return true;
         if (other?.javaClass != this.javaClass) return false
         other as Matrix<Any?>
-        for (i in 0..3) {
-            for (j in 0..3) {
-                if (other.get(i, j) != this.get(i, j)) return false
-            }
-        }
-        return true
+        return (this.hashCode() == other.hashCode())
     }
 
     override fun toString(): String {
@@ -112,6 +107,5 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
     }
 
     override fun hashCode() = allCells.hashCode()
-
 }
 

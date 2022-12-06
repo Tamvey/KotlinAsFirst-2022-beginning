@@ -249,8 +249,8 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 3 10 11  8
  */
 fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
-    for (i in 0..7) {
-        for (j in 0..7) {
+    for (i in 0..3) {
+        for (j in 0..3) {
             try {
                 if (matrix.get(i, j) == value) return Cell(i, j)
             } catch (e: Exception) {
@@ -337,18 +337,13 @@ fun clone(matrix: Matrix<Int>): Matrix<Int> {
     return res
 }
 
-fun cloneList(f: List<Int>): MutableList<Int> {
-    val newList = mutableListOf<Int>()
-    for (i in f) newList += i
-    return newList
-}
-
 fun betterChoice(initial: Matrix<Int>, end: Matrix<Int>): Int {
     var same = 0
     for (i in 0..3) {
         for (j in 0..3) {
             if (initial.get(i, j) == 0) continue
-            same += abs(getByValue(end, initial.get(i, j)).row - i) + abs(getByValue(end, initial.get(i, j)).column - j)
+            var nowEl = getByValue(end, initial.get(i, j))
+            same += abs(nowEl.row - i) + abs(nowEl.column - j)
         }
     }
     return same
@@ -372,7 +367,7 @@ fun defineIdealCases(m: Matrix<Int>, type: Int) {
     }
 }
 
-public class Move(var matrix: Matrix<Int>, var moves: MutableList<Int>, var cost: Int)
+class Move(var matrix: Matrix<Int>, var moves: MutableList<Int>, var cost: Int)
 
 fun existSolution(matrix: Matrix<Int>): Int {
     var inv = 0
@@ -407,19 +402,17 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     pq.add(Move(matrix, mutableListOf(), 100000))
     while (true) {
         var nowPair = pq.poll()
-        if (betterChoice(nowPair.matrix, idealCase) == 0) {
-            println(nowPair.moves);
+        if (nowPair.cost == 0) {
+            //println(nowPair.moves);
             return nowPair.moves
         }
         for (i in getPossibleMove(getByValue(nowPair.matrix, 0))) {
             var newMatrix = clone(nowPair.matrix)
             newMatrix.set(getByValue(newMatrix, 0), newMatrix.get(i))
             newMatrix.set(i, 0)
-            if (hs.contains(newMatrix)) {
-                continue
-            }
+            if (hs.contains(newMatrix)) continue
             hs.add(newMatrix)
-            var newMas = cloneList(nowPair.moves)
+            var newMas = nowPair.moves.toMutableList()
             newMas.add(nowPair.matrix.get(i))
             pq.add(Move(newMatrix, newMas, betterChoice(newMatrix, idealCase)))
         }
