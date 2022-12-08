@@ -2,6 +2,7 @@
 
 package lesson12.task1
 
+
 /**
  * Класс "хеш-таблица с открытой адресацией"
  *
@@ -20,18 +21,18 @@ class OpenHashSet<T>(val capacity: Int) {
     /**
      * Массив для хранения элементов хеш-таблицы
      */
-    internal val elements = Array<Any?>(capacity) { Any() }
-    private var amount = 0
+    internal val elements = Array<Any?>(capacity) { UNINITIALIZED }
 
     /**
      * Число элементов в хеш-таблице
      */
-    val size: Int get() = this.amount
+    var size: Int = 0
+        private set
 
     /**
      * Признак пустоты
      */
-    fun isEmpty() = this.amount == 0
+    fun isEmpty() = this.size == 0
 
     /**
      * Добавление элемента.
@@ -39,15 +40,15 @@ class OpenHashSet<T>(val capacity: Int) {
      * или false, если такой элемент уже был в таблице, или превышена вместимость таблицы.
      */
     fun add(element: T): Boolean {
-        if (this.amount == this.capacity) return false
+        if (this.size == this.capacity) return false
         val index = element.hashCode() % elements.size
         var counter = 0
         do {
             val newIndex = (index + counter) % elements.size
             if (elements[newIndex] == element) return false
-            if (elements[newIndex]?.javaClass == Any().javaClass) {
+            if (elements[newIndex] == UNINITIALIZED) {
                 elements[newIndex] = element
-                this.amount += 1
+                this.size += 1
                 return true
             }
             counter++
@@ -59,7 +60,7 @@ class OpenHashSet<T>(val capacity: Int) {
      * Проверка, входит ли заданный элемент в хеш-таблицу
      */
     operator fun contains(element: T): Boolean {
-        if (this.amount == 0) return false
+        if (this.size == 0) return false
         val index = element.hashCode() % elements.size
         var counter = 0
         do {
@@ -70,7 +71,7 @@ class OpenHashSet<T>(val capacity: Int) {
     }
 
     override fun hashCode() = this.size.hashCode() +
-            this.elements.map { i -> if (i?.javaClass != Any().javaClass) i.hashCode() else 0 }.sumOf { it }
+            this.elements.map { i -> if (i != UNINITIALIZED) i.hashCode() else 0 }.sumOf { it }
 
     /**
      * Таблицы равны, если в них одинаковое количество элементов,
@@ -81,9 +82,13 @@ class OpenHashSet<T>(val capacity: Int) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != this.javaClass) return false
-        if (this.hashCode() != other.hashCode()) return false
         other as OpenHashSet<Any?>
-        for (i in this.elements) if (i?.javaClass != Any().javaClass) if (!other.contains(i)) return false
+        if (this.size != other.size) return false
+        for (i in this.elements) if (i != UNINITIALIZED) if (!other.contains(i)) return false
         return true
+    }
+
+    companion object {
+        val UNINITIALIZED = Any()
     }
 }

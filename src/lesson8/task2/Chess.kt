@@ -188,8 +188,10 @@ fun getPossibleMoves(sq: Square): MutableList<Square> {
     val res = mutableListOf<Square>()
     for (i in listOf(-2, 2)) {
         for (j in listOf(-1, 1)) {
-            if (Square(sq.column + i, sq.row + j).inside()) res.add(Square(sq.column + i, sq.row + j))
-            if (Square(sq.column + j, sq.row + i).inside()) res.add(Square(sq.column + j, sq.row + i))
+            val sq1 = Square(sq.column + i, sq.row + j)
+            val sq2 = Square(sq.column + j, sq.row + i)
+            if (sq1.inside()) res.add(sq1)
+            if (sq2.inside()) res.add(sq2)
         }
     }
     return res
@@ -242,16 +244,16 @@ fun knightMoveNumber(start: Square, end: Square): Int {
 
 fun knightTrajectory(start: Square, end: Square): List<Square> {
     val mas = MutableList(8) { MutableList(8) { 0 } }
-    var memorizeMoves = mutableMapOf(Pair(start, mutableListOf(start)))
+    var memorizeMoves = mutableMapOf(Pair(start, listOf(start)))
     var moves = 1
     while (true) {
         if (memorizeMoves.keys.contains(end)) return memorizeMoves.getValue(end)
-        val bufer = mutableMapOf<Square, MutableList<Square>>()
+        val bufer = mutableMapOf<Square, List<Square>>()
         for (nowSqs in memorizeMoves.keys) {
             for (nextSq in getPossibleMoves(nowSqs)) {
                 if (moves + 1 < mas[nextSq.row - 1][nextSq.column - 1] || mas[nextSq.row - 1][nextSq.column - 1] == 0) {
                     mas[nextSq.row - 1][nextSq.column - 1] = moves + 1
-                    bufer.put(nextSq, memorizeMoves.getValue(nowSqs).plus(nextSq).toMutableList())
+                    bufer[nextSq] = memorizeMoves.getValue(nowSqs).plus(nextSq)
                 }
             }
         }

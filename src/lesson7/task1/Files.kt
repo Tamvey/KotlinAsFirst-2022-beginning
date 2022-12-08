@@ -94,7 +94,7 @@ fun countWords(text: String, word: String): Int {
 }
 
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    val res: MutableMap<String, Int> = mutableMapOf()
+    val res = mutableMapOf<String, Int>()
     val file = File(inputName).readText().lowercase()
     for (word in substrings.toSet()) {
         res[word] = countWords(file, word.lowercase())
@@ -238,7 +238,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
             val spaces = maxLength - lettersForWords
             var mas: List<Int> = listOf(0)
             if (words > 1) mas = divideSpaces(spaces, words - 1)
-            val buffer = i.split(" ").filter { it -> it != "" }.toMutableList()
+            val buffer = i.split(" ").filter { it -> it != "" }
             for (i in 0 until buffer.size) {
                 if (i < buffer.size - 1) ofile.write(buffer[i] + " ".repeat(mas[i]))
                 else ofile.write(buffer[i])
@@ -275,14 +275,14 @@ fun top20Words(inputName: String): Map<String, Int> {
     val res: MutableMap<String, Int> = mutableMapOf()
     // Counting amount of each word -> res
     for (i in ifile) {
-        val now = Regex("""[ ]+""").split(
+        val now = Regex("""\s+""").split(
             Regex("""[^а-яa-zё]""")
                 .replace(i.lowercase(), " ")
-        ).filter { it != " " && it != "" }.toMutableList()
+        ).filter { it.isNotBlank() }
         for (word in now) {
             if (!res.containsKey(word)) {
                 res.put(word, 1)
-            } else res.set(word, res.getValue(word) + 1)
+            } else res[word] = res.getValue(word) + 1
         }
     }
     // Sorting, reversion res and choosing 20 or more words

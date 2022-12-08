@@ -49,7 +49,8 @@ interface Matrix<E> {
  * height = высота, width = ширина, e = чем заполнить элементы.
  * Бросить исключение IllegalArgumentException, если height или width <= 0.
  */
-fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl<E>(height, width, e)
+fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> =
+    if (height > 0 && width > 0) MatrixImpl<E>(height, width, e) else throw IllegalArgumentException()
 
 /**
  * Средняя сложность (считается двумя задачами в 3 балла каждая)
@@ -89,7 +90,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
         if (other === this) return true;
         if (other?.javaClass != this.javaClass) return false
         other as Matrix<Any?>
-        return (this.hashCode() == other.hashCode())
+        return this.hashCode() == other.hashCode()
     }
 
     override fun toString(): String {

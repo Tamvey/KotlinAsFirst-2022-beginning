@@ -248,14 +248,18 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
+fun makeMove(matrix: Matrix<Int>, move: Int) {
+    val partWithoutZero = getByValue(matrix, move)
+    val partWithZero = getByValue(matrix, 0)
+    if (!getPossibleMove(partWithZero).contains(partWithoutZero)) throw IllegalStateException()
+    matrix[partWithZero] = move
+    matrix[partWithoutZero] = 0
+}
+
 fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
     for (i in 0..3) {
         for (j in 0..3) {
-            try {
-                if (matrix.get(i, j) == value) return Cell(i, j)
-            } catch (e: Exception) {
-                continue
-            }
+            if (matrix[i, j] == value) return Cell(i, j)
         }
     }
     return Cell(-1, -1)
@@ -277,12 +281,7 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
         if (now.row !in 0 until matrix.height || now.column !in 0 until matrix.width) throw IllegalStateException()
     }
     for (i in moves) {
-        val now = getByValue(matrix, i)
-        val placeOfEmpty = getByValue(matrix, 0)
-        // Проверка на верность расположения
-        //if (!getPossibleMove(placeOfEmpty).contains(now)) throw IllegalStateException()
-        matrix.set(placeOfEmpty, i)
-        matrix.set(now, 0)
+        makeMove(matrix, i)
     }
     return matrix
 }
@@ -331,7 +330,7 @@ fun clone(matrix: Matrix<Int>): Matrix<Int> {
     val res = createMatrix(matrix.height, matrix.width, 0)
     for (i in 0 until matrix.height) {
         for (j in 0 until matrix.width) {
-            res.set(Cell(i, j), matrix.get(Cell(i, j)))
+            res[Cell(i, j)] = matrix[Cell(i, j)]
         }
     }
     return res
@@ -341,46 +340,44 @@ fun betterChoice(initial: Matrix<Int>, end: Matrix<Int>): Int {
     var same = 0
     for (i in 0..3) {
         for (j in 0..3) {
-            if (initial.get(i, j) == 0) continue
-            var nowEl = getByValue(end, initial.get(i, j))
+            if (initial[i, j] == 0) continue
+            val nowEl = getByValue(end, initial[i, j])
             same += abs(nowEl.row - i) + abs(nowEl.column - j)
         }
     }
     return same
 }
 
-var idealCase1 = createMatrix(4, 4, 0);
-var idealCase2 = createMatrix(4, 4, 0);
 
 fun defineIdealCases(m: Matrix<Int>, type: Int) {
     var now = 1
     for (i in 0..3) {
         for (j in 0..3) {
-            m.set(i, j, now)
+            m[i, j] = now
             now++
         }
     }
-    m.set(3, 3, 0)
+    m[3, 3] = 0
     if (type == 2) {
-        m.set(3, 1, 15)
-        m.set(3, 2, 14)
+        m[3, 1] = 15
+        m[3, 2] = 14
     }
 }
 
-class Move(var matrix: Matrix<Int>, var moves: MutableList<Int>, var cost: Int)
+class Move(val matrix: Matrix<Int>, val moves: MutableList<Int>, val cost: Int)
 
 fun existSolution(matrix: Matrix<Int>): Int {
     var inv = 0
     for (i in 0..15) {
-        if (matrix.get(i / 4, i % 4) == 0) continue
+        if (matrix[i / 4, i % 4] == 0) continue
         for (j in 0 until i) {
-            if (matrix.get(j / 4, j % 4) > matrix.get(i / 4, i % 4)) {
+            if (matrix[j / 4, j % 4] > matrix[i / 4, i % 4]) {
                 inv++
             }
         }
     }
     for (i in 0..15) {
-        if (matrix.get(i / 4, i % 4) == 0) {
+        if (matrix[i / 4, i % 4] == 0) {
             inv += 1 + i / 4
         }
     }
@@ -388,34 +385,33 @@ fun existSolution(matrix: Matrix<Int>): Int {
 }
 
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    val idealCase1 = createMatrix(4, 4, 0);
+    val idealCase2 = createMatrix(4, 4, 0);
     defineIdealCases(idealCase1, 1); defineIdealCases(idealCase2, 2)
     if (minOf(betterChoice(matrix, idealCase1), betterChoice(matrix, idealCase2)) == 0) {
         return listOf()
     }
-    var exists = existSolution(matrix)
-    var idealCase: Matrix<Int>
-    if (exists % 2 == 0) idealCase = idealCase1
-    else idealCase = idealCase2
-    var comparator: Comparator<Move> = Comparator.comparing { it.cost }
-    var pq = PriorityQueue(comparator)
-    var hs = HashSet<Matrix<Int>>()
-    pq.add(Move(matrix, mutableListOf(), 100000))
+    val exists = existSolution(matrix)
+    val idealCase: Matrix<Int> = if (exists % 2 == 0) idealCase1
+    else idealCase2
+    val comparator: Comparator<Move> = Comparator.comparing { it.cost }
+    val pq = PriorityQueue(comparator)
+    val hs = HashSet<Matrix<Int>>()
+    pq.add(Move(matrix, mutableListOf(), Int.MAX_VALUE))
     while (true) {
-        var nowPair = pq.poll()
+        val nowPair = pq.poll()
         if (nowPair.cost == 0) {
-            //println(nowPair.moves);
             return nowPair.moves
         }
         for (i in getPossibleMove(getByValue(nowPair.matrix, 0))) {
-            var newMatrix = clone(nowPair.matrix)
-            newMatrix.set(getByValue(newMatrix, 0), newMatrix.get(i))
-            newMatrix.set(i, 0)
+            val newMatrix = clone(nowPair.matrix)
+            makeMove(newMatrix, newMatrix[i])
             if (hs.contains(newMatrix)) continue
             hs.add(newMatrix)
-            var newMas = nowPair.moves.toMutableList()
-            newMas.add(nowPair.matrix.get(i))
-            pq.add(Move(newMatrix, newMas, betterChoice(newMatrix, idealCase)))
+            val newMas = nowPair.moves.toMutableList()
+            newMas.add(nowPair.matrix[i])
+            pq.add(Move(newMatrix, newMas, betterChoice(newMatrix, (idealCase))))
         }
     }
-    return listOf()
+
 }
