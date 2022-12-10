@@ -84,11 +84,11 @@ class OpenHashSet<T>(val capacity: Int) {
         if (other?.javaClass != this.javaClass) return false
         other as OpenHashSet<Any?>
         if (this.size != other.size) return false
-        for (i in this.elements) if (i != UNINITIALIZED) if (!other.contains(i)) return false
+        for (i in this.elements) if (i != UNINITIALIZED && !other.contains(i)) return false
         return true
     }
 
     companion object {
-        val UNINITIALIZED = Any()
+        private val UNINITIALIZED = Any()
     }
 }

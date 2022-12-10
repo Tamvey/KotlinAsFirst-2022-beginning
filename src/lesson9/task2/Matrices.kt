@@ -265,8 +265,8 @@ fun getByValue(matrix: Matrix<Int>, value: Int): Cell {
     return Cell(-1, -1)
 }
 
-fun getPossibleMove(coordinates: Cell): List<Cell> {
-    val res = mutableListOf<Cell>()
+fun getPossibleMove(coordinates: Cell): MutableSet<Cell> {
+    val res = mutableSetOf<Cell>()
     if (coordinates.row + 1 in 0..3) res += Cell(coordinates.row + 1, coordinates.column)
     if (coordinates.row - 1 in 0..3) res += Cell(coordinates.row - 1, coordinates.column)
     if (coordinates.column + 1 in 0..3) res += Cell(coordinates.row, coordinates.column + 1)

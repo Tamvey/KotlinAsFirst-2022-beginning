@@ -89,8 +89,8 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
     override fun equals(other: Any?): Boolean {
         if (other === this) return true;
         if (other?.javaClass != this.javaClass) return false
-        other as Matrix<Any?>
-        return this.hashCode() == other.hashCode()
+        other as MatrixImpl<Any?>
+        return this.allCells == other.allCells
     }
 
     override fun toString(): String {

@@ -33,9 +33,11 @@ data class Square(val column: Int, val row: Int) {
  * В нотации, колонки обозначаются латинскими буквами от a до h, а ряды -- цифрами от 1 до 8.
  * Если нотация некорректна, бросить IllegalArgumentException
  */
-fun square(notation: String) =
-    if (Regex("""[a-h][1-8]""").matches(notation)) Square(" abcdefgh".indexOf(notation[0]), notation[1].digitToInt())
-    else throw IllegalArgumentException()
+fun square(notation: String): Square {
+    if (notation.length > 1 && notation[0].code - 'a'.code + 1 in 1..8 && notation[1].code - '0'.code in 1..8)
+        return Square(notation[0].code - 'a'.code + 1, notation[1].code - '0'.code)
+    throw IllegalArgumentException()
+}
 
 /**
  * Простая (2 балла)
@@ -188,10 +190,11 @@ fun getPossibleMoves(sq: Square): MutableList<Square> {
     val res = mutableListOf<Square>()
     for (i in listOf(-2, 2)) {
         for (j in listOf(-1, 1)) {
-            val sq1 = Square(sq.column + i, sq.row + j)
-            val sq2 = Square(sq.column + j, sq.row + i)
-            if (sq1.inside()) res.add(sq1)
-            if (sq2.inside()) res.add(sq2)
+            // Переписал метод inside, но не нужно создавать Square лишний раз
+            if (sq.column + i in 1..8 && sq.row + j in 1..8)
+                res.add(Square(sq.column + i, sq.row + j))
+            if (sq.column + j in 1..8 && sq.row + i in 1..8)
+                res.add(Square(sq.column + j, sq.row + i))
         }
     }
     return res
