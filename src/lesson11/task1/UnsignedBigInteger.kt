@@ -23,7 +23,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     constructor(s: String) {
         ubistr = Regex("""[^0-9]""").replace(s, "")
         for (i in (ubistr.length % 9)..ubistr.length step 9) {
-            var substr = ubistr.substring(maxOf(0, i - 9), i)
+            val substr = ubistr.substring(maxOf(0, i - 9), i)
             if (substr.isNotEmpty()) nums.add(substr.toInt() + base)
         }
         nums.reverse()
@@ -53,7 +53,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Сложение
      */
     operator fun plus(other: UnsignedBigInteger): UnsignedBigInteger {
-        var new = mutableListOf<Int>()
+        val new = mutableListOf<Int>()
         var add = 0
         for (i in 0..maxOf(nums.size, other.nums.size)) {
             var nowSum = add
@@ -72,7 +72,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     operator fun minus(other: UnsignedBigInteger): UnsignedBigInteger {
         if (this.compareTo(other) == -1) throw ArithmeticException()
         if (this.compareTo(other) == 0) return UnsignedBigInteger("0")
-        var new = mutableListOf<Int>()
+        val new = mutableListOf<Int>()
         var toSubstract = 0
         for (i in 0 until nums.size) {
             var varr = toSubstract
@@ -144,11 +144,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is UnsignedBigInteger) return false
-        if (this.nums.size != other.nums.size) return false
-        for (i in 0 until this.nums.size) {
-            if (this.nums[i] != other.nums[i]) return false
-        }
-        return true
+        return this.nums == other.nums
     }
 
     /**
